@@ -1032,23 +1032,23 @@ function generateCertificate() {
     ctx.fillStyle = '#000000';
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
     
-    // Add seal (moved down to about an inch above the date)
-    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
+    // Add seal (raised higher on the certificate)
+    drawSeal(ctx, canvas.width - 150, canvas.height - 180);
 }
 
 function addWatermarks(ctx, width, height) {
     ctx.save();
     ctx.globalAlpha = 0.15;
     ctx.fillStyle = '#000000';
-    ctx.font = 'bold 18px serif';
+    ctx.font = 'bold 24px serif';
     ctx.textAlign = 'center';
     
     // Add multiple watermarks across the certificate, especially over text areas
     const watermarkText = 'BULLDOG GARAGE SAFETY';
     
-    // Cover the main text area more densely
-    for (let x = 80; x < width - 80; x += 120) {
-        for (let y = 150; y < height - 100; y += 80) {
+    // Cover the main text area with reduced density
+    for (let x = 80; x < width - 80; x += 160) {
+        for (let y = 150; y < height - 100; y += 120) {
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(-Math.PI / 8);
@@ -1057,8 +1057,8 @@ function addWatermarks(ctx, width, height) {
         }
     }
     
-    // Add extra watermarks over student name area
-    for (let x = 200; x < 600; x += 100) {
+    // Add extra watermarks over student name area with reduced density
+    for (let x = 200; x < 600; x += 140) {
         ctx.save();
         ctx.translate(x, 200);
         ctx.rotate(Math.PI / 12);
@@ -1066,8 +1066,8 @@ function addWatermarks(ctx, width, height) {
         ctx.restore();
     }
     
-    // Add watermarks over email area
-    for (let x = 200; x < 600; x += 110) {
+    // Add watermarks over email area with reduced density
+    for (let x = 200; x < 600; x += 150) {
         ctx.save();
         ctx.translate(x, 380);
         ctx.rotate(-Math.PI / 10);
