@@ -4,6 +4,18 @@ let currentQuestion = 0;
 let studentData = {};
 let testData = {};
 let currentAnswers = [];
+let shuffledQuestions = [];
+let originalCorrectAnswers = [];
+
+// Utility function to shuffle an array
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
 
 // Test questions and answers
 const tests = {
@@ -222,54 +234,105 @@ const tests = {
         title: "Safety Test 3",
         questions: [
             {
-                question: "Placeholder question for Safety Test 3 - Question 1",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Don't lay tools or parts on fenders or any place where they could:",
+                answers: [
+                    "Get lost or fall off",
+                    "Look messy",
+                    "Get dirty",
+                    "Be prepared for installation"
+                ],
                 correct: 0
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 2",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 1
-            },
-            {
-                question: "Placeholder question for Safety Test 3 - Question 3",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Floor jack handles should be kept raised so that they:",
+                answers: [
+                    "Don't get bent",
+                    "Can be used quickly in an emergency",
+                    "Are not a trip hazard",
+                    "Are in a locked position"
+                ],
                 correct: 2
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 4",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 3
-            },
-            {
-                question: "Placeholder question for Safety Test 3 - Question 5",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 0
-            },
-            {
-                question: "Placeholder question for Safety Test 3 - Question 6",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Creepers are used for working under a car. When they're not in use, they should be:",
+                answers: [
+                    "Stored upside down",
+                    "Stored in an upright position",
+                    "Stacked on top of each other",
+                    "Rolled under the car"
+                ],
                 correct: 1
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 7",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Floor jacks, creepers and other shop equipment are not to be used for playing around on, because:",
+                answers: [
+                    "It makes too much noise",
+                    "The equipment may be needed for work",
+                    "You might get hurt",
+                    "They are easily damaged"
+                ],
                 correct: 2
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 8",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Spills and excessive oil, grease, gasoline or solvent must be cleaned up because they are fire hazards and because:",
+                answers: [
+                    "They look messy",
+                    "They ruin shoes",
+                    "They are slippery",
+                    "Petroleum products crack the concrete floor"
+                ],
+                correct: 2
+            },
+            {
+                question: "Avoid splashing cleaning solution or solvents because they:",
+                answers: [
+                    "Use up oxygen",
+                    "Cause skin irritation, burns and eye injuries",
+                    "Catch fire when exposed to air",
+                    "Stain the floor"
+                ],
+                correct: 1
+            },
+            {
+                question: "Damp or oily rags heat up, smolder and catch fire by themselves. This is called spontaneous combustion. That is why dirty rags are kept:",
+                answers: [
+                    "Wet",
+                    "Outside",
+                    "Against oily buildings",
+                    "In covered metal containers"
+                ],
                 correct: 3
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 9",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 0
+                question: "In an emergency, you may have to use a fire extinguisher. You should know where the fire extinguishers are located and you should: (Check all that apply)",
+                answers: [
+                    "Understand their operation",
+                    "None of these choices",
+                    "Read the instructions posted on them",
+                    "Keep one near you when welding on a car"
+                ],
+                correct: [0, 2, 3],
+                multiple: true
             },
             {
-                question: "Placeholder question for Safety Test 3 - Question 10",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 1
+                question: "Before you move a car in the shop, get permission from the instructor. Then start the car, test the brake pedal; then drive it:",
+                answers: [
+                    "Sounding the horn",
+                    "Quickly",
+                    "Very slowly",
+                    "With the hand brake on"
+                ],
+                correct: 2
+            },
+            {
+                question: "Before you begin working on a car, put the gear shift lever in:",
+                answers: [
+                    "Reverse",
+                    "High gear",
+                    "Low gear",
+                    "Neutral or park"
+                ],
+                correct: 3
             }
         ]
     },
@@ -277,54 +340,104 @@ const tests = {
         title: "Safety Test 4",
         questions: [
             {
-                question: "Placeholder question for Safety Test 4 - Question 1",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "The exhaust from a running engine contains deadly carbon monoxide gas. If you have to run an engine in the shop, be sure the area is well ventilated. If the area is not well ventilated:",
+                answers: [
+                    "Attach an exhaust system hose to the tail pipe",
+                    "Disconnect the muffler",
+                    "Keep the engine at a slow idle",
+                    "Attach a vacuum cleaner to the carburetor"
+                ],
                 correct: 0
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 2",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "An engine that has been running:",
+                answers: [
+                    "Should be disconnected before working on it",
+                    "Gets hot and may cause serious burns",
+                    "Should be wiped off",
+                    "Should be cooled off indefinitely"
+                ],
                 correct: 1
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 3",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 2
+                question: "The fan, fan belt, and pulleys of a running engine are dangerous because:",
+                answers: [
+                    "They generate fumes",
+                    "Fingers, hands, tool/equipment can get caught in them",
+                    "They get hot",
+                    "They are flammable"
+                ],
+                correct: 1
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 4",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "The car battery must be handled very carefully; since it has sulfuric acid in it. If any battery acid splashes on you or your clothing, wash it off immediately with:",
+                answers: [
+                    "Solvent",
+                    "Oil",
+                    "Gasoline",
+                    "Plain water or baking soda and water"
+                ],
                 correct: 3
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 5",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 0
-            },
-            {
-                question: "Placeholder question for Safety Test 4 - Question 6",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 1
-            },
-            {
-                question: "Placeholder question for Safety Test 4 - Question 7",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 2
-            },
-            {
-                question: "Placeholder question for Safety Test 4 - Question 8",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Never lay anything metal on the battery that could cause a short. Keep sparks and flames away from the battery. The hydrogen gas produced by the battery is:",
+                answers: [
+                    "Corrosive",
+                    "Un-reactive",
+                    "Distilled",
+                    "Flammable and explosive"
+                ],
                 correct: 3
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 9",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "When disconnecting a battery, carefully loosen and remove:",
+                answers: [
+                    "The ignition system first",
+                    "The coil first",
+                    "The starter first",
+                    "The negative ground cable first"
+                ],
+                correct: 3
+            },
+            {
+                question: "When using a battery charger, keep the charger turned off and unplugged until the charger cables are connected. Then, be sure the charger is off and unplugged before you disconnect the charger cables. This is to avoid:",
+                answers: [
+                    "Clogging the charger",
+                    "Running the charger unnecessarily",
+                    "Draining the battery",
+                    "Spark and possible explosion"
+                ],
+                correct: 3
+            },
+            {
+                question: "After the car has been raised, use jack stands to hold it up. The jack stands should be placed under the proper lifting points of the car. If the jack stands aren't used in the proper places:",
+                answers: [
+                    "The car could be damaged or could slip",
+                    "The jack won't work",
+                    "They could break",
+                    "The chocks could be damaged"
+                ],
                 correct: 0
             },
             {
-                question: "Placeholder question for Safety Test 4 - Question 10",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "When is it OK to sit on a shop car?",
+                answers: [
+                    "Only when directed by the custodian",
+                    "Never",
+                    "Anytime",
+                    "Only when you see others doing it"
+                ],
                 correct: 1
+            },
+            {
+                question: "Whenever you use power equipment such as grinders or wire wheels there is a possibility of face or eye injury, use:",
+                answers: [
+                    "Low speeds",
+                    "Safety glasses only",
+                    "Face shield and safety glasses",
+                    "A welding hood"
+                ],
+                correct: 2
             }
         ]
     },
@@ -332,53 +445,102 @@ const tests = {
         title: "Safety Test 5",
         questions: [
             {
-                question: "Placeholder question for Safety Test 5 - Question 1",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 0
-            },
-            {
-                question: "Placeholder question for Safety Test 5 - Question 2",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 1
-            },
-            {
-                question: "Placeholder question for Safety Test 5 - Question 3",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "If someone is using power equipment that has a safety zone painted on the floor around it, or even if there is no marked safety zone, you should:",
+                answers: [
+                    "Stand by the plug",
+                    "Be sure the operator is also outside the safety zone",
+                    "Stay at least 5 feet clear of the machine and outside the safety zone"
+                ],
                 correct: 2
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 4",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 3
-            },
-            {
-                question: "Placeholder question for Safety Test 5 - Question 5",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "If you are using a machine and you have to leave it for any reason:",
+                answers: [
+                    "Turn it off",
+                    "Warn everyone nearby that it is running",
+                    "Make sure the guard is in place",
+                    "Leave it running so others will know it is in use"
+                ],
                 correct: 0
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 6",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "If a piece of equipment doesn't work correctly, or it doesn't sound right, or if you can see there is something wrong with it:",
+                answers: [
+                    "Use it carefully",
+                    "Use another machine",
+                    "Try to fix it",
+                    "Tell the instructor"
+                ],
+                correct: 3
+            },
+            {
+                question: "When you lift something heavy from the floor, use the muscles in your:",
+                answers: [
+                    "Back",
+                    "Arms",
+                    "Shoulders",
+                    "Legs"
+                ],
+                correct: 3
+            },
+            {
+                question: "Something very large or heavy should be carried:",
+                answers: [
+                    "Slowly",
+                    "By two or more people",
+                    "With both hands",
+                    "Carefully by yourself"
+                ],
                 correct: 1
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 7",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Be sure you are standing on a dry floor when you are working with any electrical tools or equipment, because:",
+                answers: [
+                    "You might not conduct electricity",
+                    "You may get a shock if you are standing on a wet surface",
+                    "The equipment will not work if it's grounded",
+                    "Electricity is flammable in water"
+                ],
+                correct: 1
+            },
+            {
+                question: "Yanking on the cord to disconnect an electric plug may loosen the terminals in the plug and cause a short or a fire. The correct and safe way to disconnect a power line is to:",
+                answers: [
+                    "Use insulated pliers",
+                    "Break the circuit",
+                    "Grasp the plug and pull gently",
+                    "Yank the cord gently"
+                ],
                 correct: 2
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 8",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
-                correct: 3
+                question: "Keep electric cords out of the way so no one will trip over them. Also keep them away from water so they won't:",
+                answers: [
+                    "Get slippery",
+                    "Short out or cause electrical shock",
+                    "Get dirty",
+                    "Be ruined"
+                ],
+                correct: 1
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 9",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Frayed wiring, worn insulation or loose connections can cause:",
+                answers: [
+                    "Short-circuits, shocks, burns, or fire",
+                    "Electricity to leak out",
+                    "Spontaneous combustion",
+                    "Dirt in the wires"
+                ],
                 correct: 0
             },
             {
-                question: "Placeholder question for Safety Test 5 - Question 10",
-                answers: ["Option A", "Option B", "Option C", "Option D"],
+                question: "Illness, headache, dizziness or nausea can keep you from paying full attention to what you're doing, and that could be dangerous. If you don't feel well:",
+                answers: [
+                    "Take a break",
+                    "Tell the instructor",
+                    "Take 2 aspirin",
+                    "Keep your mind on the work"
+                ],
                 correct: 1
             }
         ]
@@ -432,6 +594,8 @@ function startTest(testNumber) {
     currentTest = testNumber;
     currentQuestion = 0;
     currentAnswers = [];
+    shuffledQuestions = [];
+    originalCorrectAnswers = [];
     
     const test = tests[testNumber];
     if (!test) {
@@ -439,21 +603,57 @@ function startTest(testNumber) {
         return;
     }
     
+    // Create a shuffled copy of questions
+    shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
+        // For each question, shuffle the answers and update correct answer indices
+        const shuffledAnswers = [...q.answers];
+        const answerMapping = shuffledAnswers.map((_, i) => i);
+        
+        // Shuffle answer mapping
+        for (let i = answerMapping.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+        }
+        
+        // Apply shuffling to answers
+        const newAnswers = answerMapping.map(i => q.answers[i]);
+        
+        // Update correct answer indices based on new positions
+        let newCorrect;
+        if (q.multiple) {
+            newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
+        } else {
+            newCorrect = answerMapping.indexOf(q.correct);
+        }
+        
+        return {
+            ...q,
+            answers: newAnswers,
+            correct: newCorrect,
+            originalIndex: index
+        };
+    }));
+    
+    // Shuffle the questions themselves
+    shuffledQuestions = shuffleArray(shuffledQuestions);
+    
+    // Store the original correct answers for scoring
+    originalCorrectAnswers = new Array(shuffledQuestions.length);
+    
     document.getElementById('quiz-title').textContent = test.title;
     showSection('quiz');
     displayQuestion();
 }
 
 function displayQuestion() {
-    const test = tests[currentTest];
-    const question = test.questions[currentQuestion];
+    const question = shuffledQuestions[currentQuestion];
     
     document.getElementById('question-number').textContent = 
-        `Question ${currentQuestion + 1} of ${test.questions.length}`;
+        `Question ${currentQuestion + 1} of ${shuffledQuestions.length}`;
     document.getElementById('question-text').textContent = question.question;
     
     // Update progress bar
-    const progress = ((currentQuestion) / test.questions.length) * 100;
+    const progress = ((currentQuestion) / shuffledQuestions.length) * 100;
     document.getElementById('progress').style.width = progress + '%';
     
     // Create answer options
@@ -491,7 +691,7 @@ function displayQuestion() {
     });
     
     // Show/hide buttons
-    if (currentQuestion === test.questions.length - 1) {
+    if (currentQuestion === shuffledQuestions.length - 1) {
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('submit-btn').style.display = 'block';
     } else {
@@ -509,12 +709,11 @@ function nextQuestion() {
 }
 
 function saveCurrentAnswer() {
-    const test = tests[currentTest];
-    if (!test || !test.questions || currentQuestion >= test.questions.length) {
+    if (!shuffledQuestions || currentQuestion >= shuffledQuestions.length) {
         return; // Invalid question index
     }
     
-    const question = test.questions[currentQuestion];
+    const question = shuffledQuestions[currentQuestion];
     
     if (question.multiple) {
         // Multiple choice question
@@ -534,12 +733,11 @@ function submitTest() {
     // Save the last answer
     saveCurrentAnswer();
     
-    // Calculate score
-    const test = tests[currentTest];
+    // Calculate score using shuffled questions
     let correct = 0;
     
-    for (let i = 0; i < test.questions.length; i++) {
-        const question = test.questions[i];
+    for (let i = 0; i < shuffledQuestions.length; i++) {
+        const question = shuffledQuestions[i];
         const userAnswer = currentAnswers[i];
         
         if (question.multiple) {
@@ -556,7 +754,7 @@ function submitTest() {
         }
     }
     
-    const percentage = Math.round((correct / test.questions.length) * 100);
+    const percentage = Math.round((correct / shuffledQuestions.length) * 100);
     
     // Save test result
     if (!testData.results) testData.results = {};
@@ -568,7 +766,36 @@ function submitTest() {
     
     localStorage.setItem('testData', JSON.stringify(testData));
     
-    // Show results
+    // Show completion modal first
+    showCompletionModal(percentage);
+}
+
+function showCompletionModal(percentage) {
+    // Create and show completion modal
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'completion-modal';
+    modal.style.display = 'block';
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Test Completed!</h3>
+            <p>Your score: ${percentage}%</p>
+            <p>${percentage === 100 ? 'Congratulations! You passed!' : 'You need 100% to pass. Please try again.'}</p>
+            <button class="btn-primary" onclick="closeCompletionModal(${percentage})">Continue</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function closeCompletionModal(percentage) {
+    const modal = document.getElementById('completion-modal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Show results after modal is closed
     showResults(percentage);
 }
 
@@ -803,21 +1030,41 @@ function generateCertificate() {
 
 function addWatermarks(ctx, width, height) {
     ctx.save();
-    ctx.globalAlpha = 0.1;
+    ctx.globalAlpha = 0.15;
     ctx.fillStyle = '#000000';
-    ctx.font = '20px serif';
+    ctx.font = 'bold 18px serif';
     ctx.textAlign = 'center';
     
-    // Add multiple watermarks across the certificate
-    for (let x = 100; x < width; x += 150) {
-        for (let y = 100; y < height; y += 100) {
+    // Add multiple watermarks across the certificate, especially over text areas
+    const watermarkText = 'BULLDOG GARAGE SAFETY';
+    
+    // Cover the main text area more densely
+    for (let x = 80; x < width - 80; x += 120) {
+        for (let y = 150; y < height - 100; y += 80) {
             ctx.save();
             ctx.translate(x, y);
-            ctx.rotate(-Math.PI / 6);
-            ctx.fillText('BULLDOG GARAGE', 0, 0);
-            ctx.fillText('SAFETY TEST', 0, 25);
+            ctx.rotate(-Math.PI / 8);
+            ctx.fillText(watermarkText, 0, 0);
             ctx.restore();
         }
+    }
+    
+    // Add extra watermarks over student name area
+    for (let x = 200; x < 600; x += 100) {
+        ctx.save();
+        ctx.translate(x, 200);
+        ctx.rotate(Math.PI / 12);
+        ctx.fillText(watermarkText, 0, 0);
+        ctx.restore();
+    }
+    
+    // Add watermarks over email area
+    for (let x = 200; x < 600; x += 110) {
+        ctx.save();
+        ctx.translate(x, 380);
+        ctx.rotate(-Math.PI / 10);
+        ctx.fillText(watermarkText, 0, 0);
+        ctx.restore();
     }
     
     ctx.restore();
@@ -835,34 +1082,93 @@ function drawSeal(ctx, x, y) {
     // Inner circle
     ctx.fillStyle = '#b8860b';
     ctx.beginPath();
-    ctx.arc(x, y, radius - 10, 0, 2 * Math.PI);
+    ctx.arc(x, y, radius - 8, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Bulldog head (simplified)
+    // Inner gold circle
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(x, y, radius - 15, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Bulldog head (more detailed)
+    // Head shape (brown/tan)
     ctx.fillStyle = '#8b4513';
     ctx.beginPath();
-    ctx.arc(x, y - 5, 25, 0, 2 * Math.PI);
+    ctx.ellipse(x, y - 3, 22, 20, 0, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Eyes
-    ctx.fillStyle = '#000000';
+    // Muzzle (lighter brown)
+    ctx.fillStyle = '#a0522d';
     ctx.beginPath();
-    ctx.arc(x - 8, y - 10, 3, 0, 2 * Math.PI);
-    ctx.arc(x + 8, y - 10, 3, 0, 2 * Math.PI);
+    ctx.ellipse(x, y + 8, 18, 12, 0, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Nose
+    // Ears (darker brown)
+    ctx.fillStyle = '#654321';
+    ctx.beginPath();
+    // Left ear
+    ctx.ellipse(x - 18, y - 15, 8, 12, -0.3, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    // Right ear  
+    ctx.ellipse(x + 18, y - 15, 8, 12, 0.3, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Eyes (white background)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(x - 8, y - 8, 4, 5, 0, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x + 8, y - 8, 4, 5, 0, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Eye pupils
     ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(x, y, 2, 0, 2 * Math.PI);
+    ctx.arc(x - 8, y - 8, 2.5, 0, 2 * Math.PI);
     ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 8, y - 8, 2.5, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Eye highlights
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x - 7, y - 9, 1, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 9, y - 9, 1, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Nose (black)
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 2, 3, 2, 0, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Mouth
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y + 4, 6, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    
+    // Wrinkles on forehead
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x - 10, y - 15);
+    ctx.quadraticCurveTo(x, y - 18, x + 10, y - 15);
+    ctx.stroke();
     
     // Text around seal
     ctx.fillStyle = '#000000';
-    ctx.font = 'bold 10px serif';
+    ctx.font = 'bold 8px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('OFFICIAL', x, y + 35);
-    ctx.fillText('SEAL', x, y + 45);
+    ctx.fillText('HEMET HIGH SCHOOL', x, y + 35);
+    ctx.fillText('OFFICIAL SEAL', x, y + 44);
 }
 
 function downloadCertificate() {
