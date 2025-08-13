@@ -1,0 +1,473 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 2px solid #333;
+}
+
+header h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.section {
+    display: none;
+    flex: 1;
+    padding: 20px 0;
+}
+
+.section.active {
+    display: block;
+}
+
+/* Registration Form Styles */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #111;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: #333;
+    border: 2px solid #555;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+/* Button Styles */
+.btn-begin {
+    background-color: #2196F3;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    margin: 0 auto;
+    min-width: 120px;
+}
+
+.btn-begin:hover {
+    background-color: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #666;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 10px;
+}
+
+.btn-secondary:hover {
+    background-color: #555;
+}
+
+.btn-certificate {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px 40px;
+    border: none;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    margin: 30px auto;
+    min-width: 250px;
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+}
+
+.btn-certificate:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+/* Test Selection Styles */
+.test-menu {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.test-menu h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.test-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.test-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    transition: all 0.3s;
+}
+
+.test-item:hover {
+    border-color: #2196F3;
+    transform: translateX(5px);
+}
+
+.test-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.test-name {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.test-score {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.test-score.passed {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.test-score.failed {
+    color: #f44336;
+}
+
+.certificate-section {
+    text-align: center;
+    margin-top: 40px;
+    padding: 30px;
+    background-color: #111;
+    border-radius: 10px;
+    border: 3px solid #4CAF50;
+}
+
+/* Quiz Styles */
+.quiz-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.quiz-header {
+    margin-bottom: 30px;
+}
+
+.quiz-header h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: #2196F3;
+    transition: width 0.3s;
+    border-radius: 5px;
+}
+
+.question-container {
+    background-color: #111;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.question-number {
+    font-size: 1.1em;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.question-text {
+    font-size: 1.3em;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.answers {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #222;
+    border: 2px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.answer-option:hover {
+    border-color: #2196F3;
+    background-color: #333;
+}
+
+.answer-option.selected {
+    border-color: #2196F3;
+    background-color: #1a365d;
+}
+
+.answer-option input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.2);
+}
+
+.answer-option label {
+    cursor: pointer;
+    flex: 1;
+}
+
+.quiz-controls {
+    text-align: center;
+}
+
+/* Results Styles */
+.results-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.results-container h2 {
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.score-display {
+    background-color: #111;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    max-width: 300px;
+    margin: 20px auto;
+}
+
+/* Certificate Styles */
+.certificate-container {
+    text-align: center;
+}
+
+#certificate-canvas {
+    border: 2px solid #333;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background-color: white;
+}
+
+.certificate-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: #111;
+    margin: 15% auto;
+    padding: 30px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.modal-content h3 {
+    color: #f44336;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+/* Footer Styles */
+footer {
+    margin-top: auto;
+    padding: 30px 0;
+    border-top: 2px solid #333;
+    text-align: center;
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
+.pulsing-glow {
+    font-size: 1.2em;
+    font-weight: bold;
+    animation: pulsing 2s infinite;
+}
+
+@keyframes pulsing {
+    0% {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff;
+    }
+    50% {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+    }
+    100% {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 2em;
+    }
+    
+    .form-container {
+        padding: 20px;
+    }
+    
+    .test-item {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .certificate-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    #certificate-canvas {
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* Print styles for certificate */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #certificate-canvas {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}

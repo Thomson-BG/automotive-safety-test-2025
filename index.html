@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulldog Garage Safety Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bulldog Garage Safety Test</h1>
+        </header>
+
+        <!-- User Registration Section -->
+        <section id="registration" class="section active">
+            <div class="form-container">
+                <h2>Student Information</h2>
+                <form id="student-form">
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">School Email Address:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentId">Student ID#:</label>
+                        <input type="text" id="studentId" name="studentId" required>
+                    </div>
+                    <button type="submit" class="btn-begin">BEGIN</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Test Selection Section -->
+        <section id="test-selection" class="section">
+            <div class="test-menu">
+                <h2>Select a Safety Test</h2>
+                <div class="test-list">
+                    <div class="test-item">
+                        <div class="test-info">
+                            <span class="test-name">Safety Test 1</span>
+                            <span class="test-score" id="score-1">Not taken</span>
+                        </div>
+                        <button class="btn-begin" onclick="startTest(1)">BEGIN</button>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-info">
+                            <span class="test-name">Safety Test 2</span>
+                            <span class="test-score" id="score-2">Not taken</span>
+                        </div>
+                        <button class="btn-begin" onclick="startTest(2)">BEGIN</button>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-info">
+                            <span class="test-name">Safety Test 3</span>
+                            <span class="test-score" id="score-3">Not taken</span>
+                        </div>
+                        <button class="btn-begin" onclick="startTest(3)">BEGIN</button>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-info">
+                            <span class="test-name">Safety Test 4</span>
+                            <span class="test-score" id="score-4">Not taken</span>
+                        </div>
+                        <button class="btn-begin" onclick="startTest(4)">BEGIN</button>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-info">
+                            <span class="test-name">Safety Test 5</span>
+                            <span class="test-score" id="score-5">Not taken</span>
+                        </div>
+                        <button class="btn-begin" onclick="startTest(5)">BEGIN</button>
+                    </div>
+                </div>
+                <div id="certificate-section" class="certificate-section" style="display: none;">
+                    <button id="view-certificate-btn" class="btn-certificate">View Certificate</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="section">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <h2 id="quiz-title">Safety Test</h2>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                </div>
+                <div class="question-container">
+                    <div class="question-number" id="question-number">Question 1 of 10</div>
+                    <div class="question-text" id="question-text"></div>
+                    <div class="answers" id="answers"></div>
+                </div>
+                <div class="quiz-controls">
+                    <button id="next-btn" class="btn-primary" onclick="nextQuestion()">Next</button>
+                    <button id="submit-btn" class="btn-primary" onclick="submitTest()" style="display: none;">Submit Test</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results" class="section">
+            <div class="results-container">
+                <h2>Test Results</h2>
+                <div class="score-display">
+                    <h3 id="final-score">Your Score: 0%</h3>
+                    <div class="chart-container">
+                        <canvas id="score-chart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="backToMenu()">Back to Test Menu</button>
+            </div>
+        </section>
+
+        <!-- Certificate Section -->
+        <section id="certificate" class="section">
+            <div class="certificate-container">
+                <div id="certificate-content">
+                    <canvas id="certificate-canvas" width="800" height="600"></canvas>
+                </div>
+                <div class="certificate-controls">
+                    <button class="btn-primary" onclick="downloadCertificate()">Download Certificate</button>
+                    <button class="btn-secondary" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Warning Modal -->
+        <div id="warning-modal" class="modal">
+            <div class="modal-content">
+                <h3>Warning</h3>
+                <p>Your certificate is not stored for long term, please download it.</p>
+                <button class="btn-primary" onclick="closeWarningModal()">OK</button>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <p>Designed by Mr. Thomson</p>
+                <p class="pulsing-glow">Thomson innovations</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
