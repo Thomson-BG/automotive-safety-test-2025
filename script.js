@@ -971,15 +971,23 @@ function generateCertificate() {
     // Main text
     ctx.font = '20px serif';
     ctx.fillStyle = '#000000';
-    const mainText = `This certificate hereby confirms that ${studentData.firstName} ${studentData.lastName} ${studentData.studentId}`;
-    ctx.fillText(mainText, canvas.width / 2, 200);
+    ctx.fillText('This certificate hereby confirms that', canvas.width / 2, 200);
     
-    ctx.fillText('has successfully passed the Bulldog Garage Safety Test', canvas.width / 2, 240);
-    ctx.fillText('with 100% accuracy.', canvas.width / 2, 280);
+    // Student name in fancy cursive/calligraphy with student ID
+    ctx.font = 'italic 32px cursive';
+    ctx.fillStyle = '#2c3e50';
+    const studentNameText = `${studentData.firstName} ${studentData.lastName} #${studentData.studentId}`;
+    ctx.fillText(studentNameText, canvas.width / 2, 250);
+    
+    // Continue with rest of text
+    ctx.font = '20px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('has successfully passed the Bulldog Garage Safety Test', canvas.width / 2, 290);
+    ctx.fillText('with 100% accuracy.', canvas.width / 2, 330);
     
     // Email
     ctx.font = '16px serif';
-    ctx.fillText(studentData.email, canvas.width / 2, 380);
+    ctx.fillText(studentData.email, canvas.width / 2, 420);
     
     // Date (Los Angeles timezone)
     const now = new Date();
@@ -1024,8 +1032,8 @@ function generateCertificate() {
     ctx.fillStyle = '#000000';
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
     
-    // Add seal
-    drawSeal(ctx, canvas.width - 150, 320);
+    // Add seal (moved down to about an inch above the date)
+    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
 }
 
 function addWatermarks(ctx, width, height) {
@@ -1073,102 +1081,112 @@ function addWatermarks(ctx, width, height) {
 function drawSeal(ctx, x, y) {
     const radius = 60;
     
-    // Outer circle (gold)
-    ctx.fillStyle = '#d4af37';
+    // Create a more realistic gold seal with metallic effect
+    
+    // Outer shadow for depth
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(x + 3, y + 3, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Outer circle (darker gold for edge)
+    ctx.fillStyle = '#b8860b';
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Inner circle
-    ctx.fillStyle = '#b8860b';
+    // Main gold circle with gradient effect
+    ctx.fillStyle = '#d4af37';
     ctx.beginPath();
-    ctx.arc(x, y, radius - 8, 0, 2 * Math.PI);
+    ctx.arc(x, y, radius - 5, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Inner gold circle
+    // Inner raised rim
     ctx.fillStyle = '#ffd700';
     ctx.beginPath();
-    ctx.arc(x, y, radius - 15, 0, 2 * Math.PI);
+    ctx.arc(x, y, radius - 10, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Bulldog head (more detailed)
-    // Head shape (brown/tan)
-    ctx.fillStyle = '#8b4513';
+    // Central pressed area (slightly darker)
+    ctx.fillStyle = '#daa520';
     ctx.beginPath();
-    ctx.ellipse(x, y - 3, 22, 20, 0, 0, 2 * Math.PI);
+    ctx.arc(x, y, radius - 18, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Muzzle (lighter brown)
-    ctx.fillStyle = '#a0522d';
-    ctx.beginPath();
-    ctx.ellipse(x, y + 8, 18, 12, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Ears (darker brown)
-    ctx.fillStyle = '#654321';
-    ctx.beginPath();
-    // Left ear
-    ctx.ellipse(x - 18, y - 15, 8, 12, -0.3, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    // Right ear  
-    ctx.ellipse(x + 18, y - 15, 8, 12, 0.3, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Eyes (white background)
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.ellipse(x - 8, y - 8, 4, 5, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x + 8, y - 8, 4, 5, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Eye pupils
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.arc(x - 8, y - 8, 2.5, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + 8, y - 8, 2.5, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Eye highlights
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x - 7, y - 9, 1, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + 9, y - 9, 1, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Nose (black)
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.ellipse(x, y + 2, 3, 2, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Mouth
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(x, y + 4, 6, 0.2, Math.PI - 0.2);
-    ctx.stroke();
-    
-    // Wrinkles on forehead
-    ctx.strokeStyle = '#654321';
+    // Add embossed ridges around the rim for realistic effect
+    ctx.strokeStyle = '#b8860b';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x - 10, y - 15);
-    ctx.quadraticCurveTo(x, y - 18, x + 10, y - 15);
-    ctx.stroke();
+    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 12) {
+        const startRadius = radius - 15;
+        const endRadius = radius - 8;
+        const startX = x + Math.cos(angle) * startRadius;
+        const startY = y + Math.sin(angle) * startRadius;
+        const endX = x + Math.cos(angle) * endRadius;
+        const endY = y + Math.sin(angle) * endRadius;
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+    }
     
-    // Text around seal
-    ctx.fillStyle = '#000000';
+    // Central text "BULLDOG" and "GARAGE" pressed into the seal
+    ctx.fillStyle = '#b8860b'; // Darker for pressed effect
+    ctx.font = 'bold 12px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('BULLDOG', x, y - 8);
+    ctx.fillText('GARAGE', x, y + 8);
+    
+    // Add decorative stars around the text
+    ctx.fillStyle = '#b8860b';
+    const starPositions = [
+        {x: x - 25, y: y - 20},
+        {x: x + 25, y: y - 20},
+        {x: x - 25, y: y + 20},
+        {x: x + 25, y: y + 20}
+    ];
+    
+    starPositions.forEach(star => {
+        drawStar(ctx, star.x, star.y, 4, 2, 1.5);
+    });
+    
+    // Outer text ring
+    ctx.fillStyle = '#8b7355';
     ctx.font = 'bold 8px serif';
     ctx.textAlign = 'center';
     ctx.fillText('HEMET HIGH SCHOOL', x, y + 35);
-    ctx.fillText('OFFICIAL SEAL', x, y + 44);
+    ctx.fillText('OFFICIAL SEAL', x, y + 45);
+    
+    // Add some highlight for 3D effect
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.beginPath();
+    ctx.arc(x - 15, y - 15, radius - 20, 0, Math.PI);
+    ctx.fill();
+}
+
+// Helper function to draw a star
+function drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
+    let rot = Math.PI / 2 * 3;
+    let step = Math.PI / spikes;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y - outerRadius);
+    
+    for (let i = 0; i < spikes; i++) {
+        let x1 = x + Math.cos(rot) * outerRadius;
+        let y1 = y + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x1, y1);
+        rot += step;
+        
+        x1 = x + Math.cos(rot) * innerRadius;
+        y1 = y + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x1, y1);
+        rot += step;
+    }
+    
+    ctx.lineTo(x, y - outerRadius);
+    ctx.closePath();
+    ctx.fill();
 }
 
 function downloadCertificate() {
