@@ -6,6 +6,7 @@ let testData = {};
 let currentAnswers = [];
 let shuffledQuestions = [];
 let originalCorrectAnswers = [];
+let testsUnlocked = true; // Default to unlocked
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
@@ -1300,6 +1301,7 @@ const tests = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    loadTestLockSettings(); // Initialize test lock settings
     showSplashScreen();
 });
 
@@ -1377,6 +1379,12 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
+    // Check if tests are locked before proceeding
+    if (!testsUnlocked) {
+        showTestsLockedModal();
+        return;
+    }
+    
     // Show loading screen first
     showTestLoadingScreen(() => {
         // This callback runs after loading is complete
@@ -2089,6 +2097,7 @@ function submitAdminLogin() {
         closeAdminLoginModal();
         showSection('admin-dashboard');
         loadTestQuestions();
+        loadTestLockSettings(); // Load test lock settings when admin logs in
     } else {
         alert('Invalid credentials. Please try again.');
         document.getElementById('admin-password').value = '';
@@ -2119,6 +2128,8 @@ function showAdminTab(tabName) {
     
     if (tabName === 'questions') {
         loadTestQuestions();
+    } else if (tabName === 'settings') {
+        loadTestLockSettings();
     }
 }
 
@@ -2329,6 +2340,52 @@ function generateCertificateOnCanvas(ctx, canvas) {
     ctx.font = '12px serif';
     ctx.fillStyle = '#000000';
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
+}
+
+// Test lock functionality
+function loadTestLockSettings() {
+    const savedSettings = localStorage.getItem('testLockSettings');
+    if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
+    }
+    updateTestLockUI();
+}
+
+function saveTestLockSettings() {
+    const settings = {
+        testsUnlocked: testsUnlocked
+    };
+    localStorage.setItem('testLockSettings', JSON.stringify(settings));
+}
+
+function toggleTestAccess() {
+    const toggle = document.getElementById('tests-unlocked-toggle');
+    testsUnlocked = toggle.checked;
+    updateTestLockUI();
+    saveTestLockSettings();
+}
+
+function updateTestLockUI() {
+    const toggle = document.getElementById('tests-unlocked-toggle');
+    const statusText = document.getElementById('test-status-text');
+    
+    if (toggle) {
+        toggle.checked = testsUnlocked;
+    }
+    
+    if (statusText) {
+        statusText.textContent = testsUnlocked ? 'Tests are UNLOCKED' : 'Tests are LOCKED';
+        statusText.className = testsUnlocked ? 'status-text unlocked' : 'status-text locked';
+    }
+}
+
+function showTestsLockedModal() {
+    document.getElementById('tests-locked-modal').style.display = 'block';
+}
+
+function closeTestsLockedModal() {
+    document.getElementById('tests-locked-modal').style.display = 'none';
 }
 
 // Detect if developer tools are open (basic detection)
