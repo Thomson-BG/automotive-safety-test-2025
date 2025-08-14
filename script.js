@@ -1608,6 +1608,17 @@ function closeCompletionModal(percentage) {
 }
 
 function retakeQuiz() {
+    // Check if tests are locked before allowing retake
+    if (!testsUnlocked) {
+        // Close the completion modal first
+        const modal = document.getElementById('completion-modal');
+        if (modal) {
+            modal.remove();
+        }
+        showTestsLockedModal();
+        return;
+    }
+    
     // Close the completion modal
     const modal = document.getElementById('completion-modal');
     if (modal) {
@@ -1728,10 +1739,102 @@ function checkAllTestsPassed() {
     }
 }
 
+function triggerConfetti() {
+    // Create confetti animation function
+    const createConfetti = () => {
+        const confettiContainer = document.createElement('div');
+        confettiContainer.id = 'confetti-container';
+        confettiContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        `;
+        document.body.appendChild(confettiContainer);
+
+        // Colors for confetti
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#6c5ce7', '#fd79a8', '#00b894'];
+        
+        // Create ridiculous amount of confetti pieces
+        for (let i = 0; i < 200; i++) {
+            const confettiPiece = document.createElement('div');
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 8 + 4; // 4-12px
+            const startX = Math.random() < 0.5 ? -10 : window.innerWidth + 10; // Start from sides
+            const endX = Math.random() * window.innerWidth;
+            const animationDuration = Math.random() * 3 + 2; // 2-5 seconds
+            const delay = Math.random() * 1; // 0-1 second delay
+            
+            confettiPiece.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background-color: ${color};
+                top: -10px;
+                left: ${startX}px;
+                animation: confetti-fall-${i} ${animationDuration}s linear ${delay}s forwards;
+                transform: rotate(${Math.random() * 360}deg);
+            `;
+            
+            // Create unique keyframe animation for each piece
+            const keyframes = `
+                @keyframes confetti-fall-${i} {
+                    0% { 
+                        transform: translateY(-10px) translateX(0px) rotate(0deg) scale(1);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: translateY(${window.innerHeight / 2}px) translateX(${(endX - startX) / 2}px) rotate(${Math.random() * 720}deg) scale(${Math.random() * 0.8 + 0.6});
+                        opacity: 1;
+                    }
+                    100% { 
+                        transform: translateY(${window.innerHeight + 20}px) translateX(${endX - startX}px) rotate(${Math.random() * 1080}deg) scale(0.3);
+                        opacity: 0;
+                    }
+                }
+            `;
+            
+            // Add keyframes to document
+            const style = document.createElement('style');
+            style.textContent = keyframes;
+            document.head.appendChild(style);
+            
+            confettiContainer.appendChild(confettiPiece);
+        }
+        
+        // Remove confetti after animation completes
+        setTimeout(() => {
+            if (confettiContainer.parentNode) {
+                confettiContainer.parentNode.removeChild(confettiContainer);
+            }
+            // Clean up styles
+            document.querySelectorAll('style').forEach(style => {
+                if (style.textContent.includes('confetti-fall-')) {
+                    style.remove();
+                }
+            });
+        }, 6000);
+    };
+    
+    createConfetti();
+}
+
 function viewCertificate() {
     generateCertificate();
     showSection('certificate');
     showWarningModal();
+    
+    // Check if this is the first time viewing the certificate
+    const hasViewedCertificate = localStorage.getItem('hasViewedCertificate');
+    if (!hasViewedCertificate) {
+        // Mark as viewed and trigger confetti
+        localStorage.setItem('hasViewedCertificate', 'true');
+        triggerConfetti();
+    }
 }
 
 // Add event listener for certificate button
