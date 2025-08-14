@@ -1049,7 +1049,8 @@ const tests = {
                 answers: [
                     "Stand by the plug",
                     "Be sure the operator is also outside the safety zone",
-                    "Stay at least 5 feet clear of the machine and outside the safety zone"
+                    "Stay at least 5 feet clear of the machine and outside the safety zone",
+                    "Get as close as possible to observe the work"
                 ],
                 correct: 2
             },
