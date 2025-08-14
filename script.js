@@ -1038,42 +1038,28 @@ function generateCertificate() {
 
 function addWatermarks(ctx, width, height) {
     ctx.save();
-    ctx.globalAlpha = 0.15;
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 18px serif';
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#cccccc';
+    ctx.font = 'bold 16px serif';
     ctx.textAlign = 'center';
     
-    // Add multiple watermarks across the certificate, especially over text areas
+    // Add exactly 5 strategic watermarks for professional look
     const watermarkText = 'BULLDOG GARAGE SAFETY';
+    const positions = [
+        {x: width * 0.25, y: height * 0.35, rotation: -Math.PI / 12},
+        {x: width * 0.75, y: height * 0.35, rotation: Math.PI / 12},
+        {x: width * 0.3, y: height * 0.6, rotation: -Math.PI / 10},
+        {x: width * 0.7, y: height * 0.6, rotation: Math.PI / 10},
+        {x: width * 0.5, y: height * 0.8, rotation: 0}
+    ];
     
-    // Cover the main text area more densely
-    for (let x = 80; x < width - 80; x += 120) {
-        for (let y = 150; y < height - 100; y += 80) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(-Math.PI / 8);
-            ctx.fillText(watermarkText, 0, 0);
-            ctx.restore();
-        }
-    }
-    
-    // Add extra watermarks over student name area
-    for (let x = 200; x < 600; x += 100) {
+    positions.forEach(pos => {
         ctx.save();
-        ctx.translate(x, 200);
-        ctx.rotate(Math.PI / 12);
+        ctx.translate(pos.x, pos.y);
+        ctx.rotate(pos.rotation);
         ctx.fillText(watermarkText, 0, 0);
         ctx.restore();
-    }
-    
-    // Add watermarks over email area
-    for (let x = 200; x < 600; x += 110) {
-        ctx.save();
-        ctx.translate(x, 380);
-        ctx.rotate(-Math.PI / 10);
-        ctx.fillText(watermarkText, 0, 0);
-        ctx.restore();
-    }
+    });
     
     ctx.restore();
 }
@@ -1081,44 +1067,67 @@ function addWatermarks(ctx, width, height) {
 function drawSeal(ctx, x, y) {
     const radius = 60;
     
-    // Create a more realistic gold seal with metallic effect
+    // Create a realistic gold seal with proper metallic lighting and shadows
     
-    // Outer shadow for depth
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    // Multiple shadow layers for depth
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.beginPath();
-    ctx.arc(x + 3, y + 3, radius, 0, 2 * Math.PI);
+    ctx.arc(x + 4, y + 4, radius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Outer circle (darker gold for edge)
-    ctx.fillStyle = '#b8860b';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.arc(x + 2, y + 2, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Create gradient effect for metallic look
+    const gradient = ctx.createRadialGradient(x - 20, y - 20, 0, x, y, radius);
+    gradient.addColorStop(0, '#ffd700');
+    gradient.addColorStop(0.3, '#d4af37');
+    gradient.addColorStop(0.6, '#b8860b');
+    gradient.addColorStop(1, '#8b6914');
+    
+    // Main seal circle
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Main gold circle with gradient effect
-    ctx.fillStyle = '#d4af37';
+    // Add metallic rim with highlights
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(x, y, radius - 5, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.arc(x, y, radius - 2, 0, 2 * Math.PI);
+    ctx.stroke();
     
-    // Inner raised rim
-    ctx.fillStyle = '#ffd700';
+    // Inner raised rim with highlight
+    const innerGradient = ctx.createRadialGradient(x - 15, y - 15, 0, x, y, radius - 10);
+    innerGradient.addColorStop(0, '#fff700');
+    innerGradient.addColorStop(0.5, '#ffd700');
+    innerGradient.addColorStop(1, '#d4af37');
+    
+    ctx.fillStyle = innerGradient;
     ctx.beginPath();
     ctx.arc(x, y, radius - 10, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Central pressed area (slightly darker)
-    ctx.fillStyle = '#daa520';
+    // Central pressed area with realistic depression
+    const centralGradient = ctx.createRadialGradient(x, y, 0, x, y, radius - 18);
+    centralGradient.addColorStop(0, '#b8860b');
+    centralGradient.addColorStop(0.8, '#d4af37');
+    centralGradient.addColorStop(1, '#ffd700');
+    
+    ctx.fillStyle = centralGradient;
     ctx.beginPath();
     ctx.arc(x, y, radius - 18, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Add embossed ridges around the rim for realistic effect
-    ctx.strokeStyle = '#b8860b';
-    ctx.lineWidth = 1;
-    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 12) {
-        const startRadius = radius - 15;
-        const endRadius = radius - 8;
+    // Add embossed ridges around the rim for texture
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 1.5;
+    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 16) {
+        const startRadius = radius - 8;
+        const endRadius = radius - 3;
         const startX = x + Math.cos(angle) * startRadius;
         const startY = y + Math.sin(angle) * startRadius;
         const endX = x + Math.cos(angle) * endRadius;
@@ -1130,37 +1139,52 @@ function drawSeal(ctx, x, y) {
         ctx.stroke();
     }
     
-    // Central text "BULLDOG" and "GARAGE" pressed into the seal
-    ctx.fillStyle = '#b8860b'; // Darker for pressed effect
-    ctx.font = 'bold 12px serif';
+    // Central text with embossed effect
+    ctx.fillStyle = '#654321';
+    ctx.font = 'bold 11px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('BULLDOG', x, y - 8);
-    ctx.fillText('GARAGE', x, y + 8);
+    ctx.fillText('BULLDOG', x + 1, y - 7);
+    ctx.fillText('GARAGE', x + 1, y + 9);
     
-    // Add decorative stars around the text
-    ctx.fillStyle = '#b8860b';
+    // Highlight on text for embossed look
+    ctx.fillStyle = '#fff4e6';
+    ctx.fillText('BULLDOG', x - 0.5, y - 8);
+    ctx.fillText('GARAGE', x - 0.5, y + 8);
+    
+    // Add decorative elements
+    ctx.fillStyle = '#8b6914';
     const starPositions = [
-        {x: x - 25, y: y - 20},
-        {x: x + 25, y: y - 20},
-        {x: x - 25, y: y + 20},
-        {x: x + 25, y: y + 20}
+        {x: x - 28, y: y - 18},
+        {x: x + 28, y: y - 18},
+        {x: x - 28, y: y + 22},
+        {x: x + 28, y: y + 22}
     ];
     
     starPositions.forEach(star => {
-        drawStar(ctx, star.x, star.y, 4, 2, 1.5);
+        drawStar(ctx, star.x, star.y, 5, 3, 1.5);
     });
     
-    // Outer text ring
-    ctx.fillStyle = '#8b7355';
-    ctx.font = 'bold 8px serif';
+    // Outer text ring with shadow
+    ctx.fillStyle = '#4a4a4a';
+    ctx.font = 'bold 7px serif';
     ctx.textAlign = 'center';
+    ctx.fillText('HEMET HIGH SCHOOL', x + 0.5, y + 36);
+    ctx.fillText('OFFICIAL SEAL', x + 0.5, y + 46);
+    
+    // Highlight on outer text
+    ctx.fillStyle = '#2c2c2c';
     ctx.fillText('HEMET HIGH SCHOOL', x, y + 35);
     ctx.fillText('OFFICIAL SEAL', x, y + 45);
     
-    // Add some highlight for 3D effect
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Add realistic highlight for 3D metallic effect
+    const highlightGradient = ctx.createRadialGradient(x - 20, y - 20, 0, x - 10, y - 10, radius - 10);
+    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    highlightGradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)');
+    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    ctx.fillStyle = highlightGradient;
     ctx.beginPath();
-    ctx.arc(x - 15, y - 15, radius - 20, 0, Math.PI);
+    ctx.arc(x - 15, y - 15, radius - 15, 0, Math.PI * 1.5);
     ctx.fill();
 }
 
