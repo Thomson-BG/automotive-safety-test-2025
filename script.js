@@ -559,6 +559,17 @@ function setupEventListeners() {
         e.preventDefault();
         submitStudentForm();
     });
+    
+    // Admin login button
+    document.getElementById('admin-login-btn').addEventListener('click', function() {
+        showAdminLoginModal();
+    });
+    
+    // Admin login form
+    document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitAdminLogin();
+    });
 }
 
 function submitStudentForm() {
@@ -1255,6 +1266,272 @@ document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
     return false;
 });
+
+// Admin functionality
+let isAdminLoggedIn = false;
+
+function showAdminLoginModal() {
+    document.getElementById('admin-login-modal').style.display = 'block';
+}
+
+function closeAdminLoginModal() {
+    document.getElementById('admin-login-modal').style.display = 'none';
+    document.getElementById('admin-login-form').reset();
+}
+
+function submitAdminLogin() {
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    
+    if (username === 'Thomson' && password === 'Bulldog!1') {
+        isAdminLoggedIn = true;
+        closeAdminLoginModal();
+        showSection('admin-dashboard');
+        loadTestQuestions();
+    } else {
+        alert('Invalid credentials. Please try again.');
+        document.getElementById('admin-password').value = '';
+    }
+}
+
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    showSection('registration');
+}
+
+function showAdminTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(`admin-${tabName}`).classList.add('active');
+    
+    // Add active class to clicked tab button
+    event.target.classList.add('active');
+    
+    if (tabName === 'questions') {
+        loadTestQuestions();
+    }
+}
+
+function loadTestQuestions() {
+    const selectedTest = document.getElementById('admin-test-select').value;
+    const questionsList = document.getElementById('questions-list');
+    
+    if (!tests[selectedTest]) return;
+    
+    questionsList.innerHTML = '';
+    
+    tests[selectedTest].questions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <h4>Question ${index + 1}</h4>
+            <p><strong>${question.question}</strong></p>
+            <div class="answers">
+                ${question.answers.map((answer, ansIndex) => `
+                    <div class="answer ${ansIndex === question.correct ? 'correct' : ''}">
+                        ${ansIndex === question.correct ? '✓ ' : ''}${answer}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="question-actions">
+                <button class="btn-edit" onclick="editQuestion(${selectedTest}, ${index})">Edit</button>
+                <button class="btn-delete" onclick="deleteQuestion(${selectedTest}, ${index})">Delete</button>
+            </div>
+        `;
+        questionsList.appendChild(questionDiv);
+    });
+}
+
+function editQuestion(testNum, questionIndex) {
+    // For this implementation, we'll just show an alert
+    // In a full implementation, this would open an edit form
+    const question = tests[testNum].questions[questionIndex];
+    const newQuestion = prompt('Edit question:', question.question);
+    
+    if (newQuestion && newQuestion.trim()) {
+        tests[testNum].questions[questionIndex].question = newQuestion.trim();
+        loadTestQuestions();
+        alert('Question updated successfully!');
+    }
+}
+
+function deleteQuestion(testNum, questionIndex) {
+    if (confirm('Are you sure you want to delete this question?')) {
+        tests[testNum].questions.splice(questionIndex, 1);
+        loadTestQuestions();
+        alert('Question deleted successfully!');
+    }
+}
+
+function addNewQuestion() {
+    const selectedTest = document.getElementById('admin-test-select').value;
+    const question = prompt('Enter new question:');
+    
+    if (question && question.trim()) {
+        const answers = [];
+        for (let i = 0; i < 4; i++) {
+            const answer = prompt(`Enter answer ${i + 1}:`);
+            if (answer && answer.trim()) {
+                answers.push(answer.trim());
+            } else {
+                alert('All 4 answers are required.');
+                return;
+            }
+        }
+        
+        const correctIndex = parseInt(prompt('Enter the number of the correct answer (1-4):')) - 1;
+        
+        if (correctIndex >= 0 && correctIndex < 4) {
+            tests[selectedTest].questions.push({
+                question: question.trim(),
+                answers: answers,
+                correct: correctIndex
+            });
+            loadTestQuestions();
+            alert('Question added successfully!');
+        } else {
+            alert('Invalid correct answer number.');
+        }
+    }
+}
+
+function viewExampleCertificate() {
+    const canvas = document.getElementById('admin-certificate-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Save current student data
+    const originalStudentData = { ...studentData };
+    
+    // Set example data
+    studentData = {
+        firstName: 'Bulldog',
+        lastName: 'Garage',
+        email: 'jthomson@hemetusd.org',
+        studentId: '123456'
+    };
+    
+    // Generate certificate with example data
+    generateCertificateOnCanvas(ctx, canvas);
+    
+    // Restore original student data
+    studentData = originalStudentData;
+}
+
+function generateCertificateOnCanvas(ctx, canvas) {
+    // Set canvas size
+    canvas.width = 800;
+    canvas.height = 600;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add watermarks
+    addWatermarks(ctx, canvas.width, canvas.height);
+    
+    // Border
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+    
+    // Inner border
+    ctx.strokeStyle = '#8b7355';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+    
+    // Title
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 36px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 120);
+    
+    // Decorative line
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(200, 140);
+    ctx.lineTo(600, 140);
+    ctx.stroke();
+    
+    // Main text
+    ctx.font = '20px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('This certificate hereby confirms that', canvas.width / 2, 200);
+    
+    // Student name in fancy cursive/calligraphy with student ID
+    ctx.font = 'italic 32px cursive';
+    ctx.fillStyle = '#2c3e50';
+    const studentNameText = `${studentData.firstName} ${studentData.lastName} #${studentData.studentId}`;
+    ctx.fillText(studentNameText, canvas.width / 2, 250);
+    
+    // Continue with rest of text
+    ctx.font = '20px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('has successfully passed the Bulldog Garage Safety Test', canvas.width / 2, 290);
+    ctx.fillText('with 100% accuracy.', canvas.width / 2, 330);
+    
+    // Email
+    ctx.font = '16px serif';
+    ctx.fillText(studentData.email, canvas.width / 2, 420);
+    
+    // Date (Los Angeles timezone)
+    const now = new Date();
+    const losAngelesTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+    const dateStr = losAngelesTime.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    ctx.textAlign = 'right';
+    ctx.fillText(dateStr, canvas.width - 60, canvas.height - 60);
+    
+    // Signature section
+    ctx.textAlign = 'left';
+    ctx.font = '14px serif';
+    ctx.fillText('By issuance of this certificate, I hereby acknowledge', 60, canvas.height - 140);
+    ctx.fillText('this student has satisfied the requirements for the Safety Test.', 60, canvas.height - 120);
+    
+    // Signature line
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(60, canvas.height - 80);
+    ctx.lineTo(260, canvas.height - 80);
+    ctx.stroke();
+    
+    // Signature
+    ctx.font = 'italic 24px cursive';
+    ctx.fillStyle = '#000080';
+    ctx.fillText('JT', 140, canvas.height - 85);
+    
+    // Circle around signature
+    ctx.strokeStyle = '#000080';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(150, canvas.height - 90, 25, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    // Name under signature
+    ctx.font = '12px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
+    
+    // Add seal (moved down to about an inch above the date)
+    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
+}
 
 // Detect if developer tools are open (basic detection)
 let devtools = {open: false};

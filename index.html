@@ -12,6 +12,7 @@
         <header>
             <h1>Bulldog Garage Safety Test</h1>
             <h2 class="school-subtitle">Hemet High School</h2>
+            <button id="admin-login-btn" class="admin-login-btn">Admin Login</button>
         </header>
 
         <!-- User Registration Section -->
@@ -143,6 +144,71 @@
                 <button class="btn-primary" onclick="closeWarningModal()">OK</button>
             </div>
         </div>
+
+        <!-- Admin Login Modal -->
+        <div id="admin-login-modal" class="modal">
+            <div class="modal-content">
+                <h3>Admin Login</h3>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label for="admin-username">Username:</label>
+                        <input type="text" id="admin-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Password:</label>
+                        <input type="password" id="admin-password" name="password" required>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn-primary">Login</button>
+                        <button type="button" class="btn-secondary" onclick="closeAdminLoginModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Section -->
+        <section id="admin-dashboard" class="section">
+            <div class="admin-container">
+                <div class="admin-header">
+                    <h2>Admin Dashboard</h2>
+                    <button class="btn-secondary" onclick="logoutAdmin()">Logout</button>
+                </div>
+                
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="showAdminTab('questions')">Manage Questions</button>
+                    <button class="tab-btn" onclick="showAdminTab('certificate')">View Certificate</button>
+                </div>
+
+                <div id="admin-questions" class="admin-tab-content active">
+                    <h3>Question Management</h3>
+                    <div class="test-selector">
+                        <label for="admin-test-select">Select Test:</label>
+                        <select id="admin-test-select" onchange="loadTestQuestions()">
+                            <option value="1">Safety Test 1</option>
+                            <option value="2">Safety Test 2</option>
+                            <option value="3">Safety Test 3</option>
+                            <option value="4">Safety Test 4</option>
+                            <option value="5">Safety Test 5</option>
+                        </select>
+                    </div>
+                    
+                    <div id="questions-list" class="questions-list">
+                        <!-- Questions will be loaded here -->
+                    </div>
+                    
+                    <button class="btn-primary" onclick="addNewQuestion()">Add New Question</button>
+                </div>
+
+                <div id="admin-certificate" class="admin-tab-content">
+                    <h3>Example Certificate Preview</h3>
+                    <p>Preview certificate for: <strong>Bulldog Garage</strong> (ID: 123456)</p>
+                    <button class="btn-primary" onclick="viewExampleCertificate()">Generate Example Certificate</button>
+                    <div id="admin-certificate-content">
+                        <canvas id="admin-certificate-canvas" width="800" height="600"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <footer>
             <div class="footer-content">
