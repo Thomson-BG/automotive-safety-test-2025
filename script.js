@@ -122,6 +122,156 @@ const tests = {
                     "Only when calling home"
                 ],
                 correct: 0
+            },
+            {
+                question: "Before entering the automotive shop, students must:",
+                answers: [
+                    "Remove all jewelry and secure loose clothing",
+                    "Bring snacks for energy",
+                    "Wear their best clothes",
+                    "Turn on all equipment"
+                ],
+                correct: 0
+            },
+            {
+                question: "Safety Data Sheets (SDS) provide information about:",
+                answers: [
+                    "Student grades",
+                    "Hazardous chemicals and materials",
+                    "Shop schedules",
+                    "Vehicle maintenance records"
+                ],
+                correct: 1
+            },
+            {
+                question: "The proper way to lift heavy objects is:",
+                answers: [
+                    "Bend at the waist and lift quickly",
+                    "Use your back muscles only",
+                    "Bend your knees and keep your back straight",
+                    "Twist while lifting to save time"
+                ],
+                correct: 2
+            },
+            {
+                question: "If you cut yourself with a tool, you should:",
+                answers: [
+                    "Continue working and ignore the cut",
+                    "Wash the cut and apply a bandage yourself",
+                    "Immediately report it to the instructor and seek first aid",
+                    "Ask another student to help you"
+                ],
+                correct: 2
+            },
+            {
+                question: "When walking through the shop, you should:",
+                answers: [
+                    "Run to save time",
+                    "Walk quickly while texting",
+                    "Walk calmly and be aware of your surroundings",
+                    "Walk backwards to see where you've been"
+                ],
+                correct: 2
+            },
+            {
+                question: "Shop ventilation systems are important because they:",
+                answers: [
+                    "Keep the shop cool in summer",
+                    "Remove harmful fumes and provide fresh air",
+                    "Make the shop louder",
+                    "Help tools work better"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before using any chemical in the shop, you should:",
+                answers: [
+                    "Smell it to identify what it is",
+                    "Read the Safety Data Sheet (SDS)",
+                    "Mix it with other chemicals",
+                    "Use as much as you want"
+                ],
+                correct: 1
+            },
+            {
+                question: "The emergency eyewash station should be used when:",
+                answers: [
+                    "You want to clean your glasses",
+                    "You get chemicals or debris in your eyes",
+                    "You are thirsty",
+                    "The regular sink is busy"
+                ],
+                correct: 1
+            },
+            {
+                question: "Shop safety rules exist to:",
+                answers: [
+                    "Make work more difficult",
+                    "Protect students, instructors, and equipment",
+                    "Slow down productivity",
+                    "Satisfy legal requirements only"
+                ],
+                correct: 1
+            },
+            {
+                question: "If you witness an accident in the shop, you should:",
+                answers: [
+                    "Take pictures with your phone",
+                    "Immediately notify the instructor",
+                    "Try to fix the problem yourself",
+                    "Continue working and ignore it"
+                ],
+                correct: 1
+            },
+            {
+                question: "Eating and drinking in the automotive shop is:",
+                answers: [
+                    "Allowed during break time only",
+                    "Allowed if you wash your hands first",
+                    "Never allowed due to contamination risks",
+                    "Allowed only with instructor permission"
+                ],
+                correct: 2
+            },
+            {
+                question: "The first thing to do when entering the shop each day is:",
+                answers: [
+                    "Start working immediately",
+                    "Check for any safety hazards or spills",
+                    "Turn on all the equipment",
+                    "Open all the tool cabinets"
+                ],
+                correct: 1
+            },
+            {
+                question: "If you don't understand a safety procedure, you should:",
+                answers: [
+                    "Guess and try your best",
+                    "Ask another student for help",
+                    "Ask the instructor for clarification",
+                    "Skip that procedure"
+                ],
+                correct: 2
+            },
+            {
+                question: "Material Safety Data Sheets (MSDS) must be:",
+                answers: [
+                    "Kept in the instructor's office only",
+                    "Easily accessible to all shop users",
+                    "Memorized by students",
+                    "Updated every five years"
+                ],
+                correct: 1
+            },
+            {
+                question: "When handling hazardous waste materials, you should:",
+                answers: [
+                    "Dispose of them in regular trash",
+                    "Pour them down the drain",
+                    "Follow proper disposal procedures and regulations",
+                    "Store them anywhere convenient"
+                ],
+                correct: 2
             }
         ]
     },
@@ -227,6 +377,156 @@ const tests = {
                     "Only when calling home"
                 ],
                 correct: 2
+            },
+            {
+                question: "Safety glasses must be worn:",
+                answers: [
+                    "Only when using power tools",
+                    "At all times in the shop area",
+                    "Only when the instructor is watching",
+                    "Only when working under a vehicle"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before using compressed air to clean parts, you should:",
+                answers: [
+                    "Set the pressure as high as possible",
+                    "Wear safety glasses and keep pressure below 30 PSI",
+                    "Point it at other students first",
+                    "Use it without any protection"
+                ],
+                correct: 1
+            },
+            {
+                question: "When using a grinder, you should always:",
+                answers: [
+                    "Wear a face shield and safety glasses",
+                    "Hold the work piece with your hands only",
+                    "Grind on the side of the wheel",
+                    "Remove the safety guard for better access"
+                ],
+                correct: 0
+            },
+            {
+                question: "Pneumatic tools should be:",
+                answers: [
+                    "Connected to any air source",
+                    "Inspected before use and properly maintained",
+                    "Used at maximum pressure always",
+                    "Shared without cleaning between users"
+                ],
+                correct: 1
+            },
+            {
+                question: "When using hand files, you should:",
+                answers: [
+                    "File without a handle to feel the work better",
+                    "Always use a proper handle and file away from your body",
+                    "File toward your body for better control",
+                    "Use files for prying or hammering"
+                ],
+                correct: 1
+            },
+            {
+                question: "The proper way to hand someone a sharp tool is:",
+                answers: [
+                    "Throw it to them carefully",
+                    "Place it on a surface for them to pick up by the handle",
+                    "Hand it to them point first",
+                    "Toss it gently in their direction"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before using any power tool, you should:",
+                answers: [
+                    "Assume it's working properly",
+                    "Inspect it for damage and proper guards",
+                    "Oil all moving parts first",
+                    "Test it on scrap material immediately"
+                ],
+                correct: 1
+            },
+            {
+                question: "When using hammers, you should:",
+                answers: [
+                    "Strike with the side of the hammer head",
+                    "Keep others clear and strike squarely with the face",
+                    "Use any object as a striking surface",
+                    "Hit as hard as possible every time"
+                ],
+                correct: 1
+            },
+            {
+                question: "Damaged or worn tools should be:",
+                answers: [
+                    "Used carefully until they break completely",
+                    "Removed from service and reported to the instructor",
+                    "Repaired by students during class",
+                    "Hidden so others won't use them"
+                ],
+                correct: 1
+            },
+            {
+                question: "When working with cutting tools, you should:",
+                answers: [
+                    "Cut toward your body for better control",
+                    "Always cut away from your body and others",
+                    "Use maximum force to cut through materials",
+                    "Keep blades as dull as possible for safety"
+                ],
+                correct: 1
+            },
+            {
+                question: "Personal protective equipment (PPE) should be:",
+                answers: [
+                    "Shared between students to save money",
+                    "Properly maintained and inspected regularly",
+                    "Used only when convenient",
+                    "Cleaned once per semester"
+                ],
+                correct: 1
+            },
+            {
+                question: "When using pliers or wrenches, you should:",
+                answers: [
+                    "Pull toward your body whenever possible",
+                    "Push away from your body to avoid injury if the tool slips",
+                    "Use them as hammers when needed",
+                    "Apply maximum force always"
+                ],
+                correct: 1
+            },
+            {
+                question: "The purpose of tool guards and safety devices is to:",
+                answers: [
+                    "Make tools look more professional",
+                    "Protect the user from injury",
+                    "Slow down work progress",
+                    "Make tools more expensive"
+                ],
+                correct: 1
+            },
+            {
+                question: "When storing sharp tools, you should:",
+                answers: [
+                    "Place them loosely in a drawer",
+                    "Store them in proper holders or sheaths",
+                    "Leave them on work benches",
+                    "Throw them in a tool box"
+                ],
+                correct: 1
+            },
+            {
+                question: "Hearing protection should be worn when:",
+                answers: [
+                    "Only during loud music",
+                    "Using loud power tools or in noisy environments",
+                    "Never in the shop",
+                    "Only when talking to others"
+                ],
+                correct: 1
             }
         ]
     },
@@ -333,6 +633,156 @@ const tests = {
                     "Neutral or park"
                 ],
                 correct: 3
+            },
+            {
+                question: "When positioning a vehicle on a lift, you should:",
+                answers: [
+                    "Lift it as quickly as possible",
+                    "Carefully position lifting points and check for proper balance",
+                    "Assume the lift points are always correct",
+                    "Lift one end at a time only"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before raising a vehicle on a lift, you should:",
+                answers: [
+                    "Remove all tools from under the vehicle",
+                    "Check that doors, hood, and trunk are securely closed",
+                    "Make sure nobody is near the vehicle",
+                    "All of the above"
+                ],
+                correct: 3
+            },
+            {
+                question: "Wheel chocks should be used:",
+                answers: [
+                    "Only on hills",
+                    "On wheels remaining on the ground when vehicle is raised",
+                    "Only for large vehicles",
+                    "Only when the parking brake is broken"
+                ],
+                correct: 1
+            },
+            {
+                question: "When working under a raised vehicle, you should:",
+                answers: [
+                    "Work quickly to get out from under it",
+                    "Make sure jack stands are properly positioned as backup",
+                    "Never work under a raised vehicle",
+                    "Stand directly under the heaviest part"
+                ],
+                correct: 1
+            },
+            {
+                question: "Gasoline vapors are dangerous because they:",
+                answers: [
+                    "Smell bad",
+                    "Are heavier than air and highly flammable",
+                    "Are lighter than air",
+                    "Are good for the environment"
+                ],
+                correct: 1
+            },
+            {
+                question: "When using a floor jack, you should:",
+                answers: [
+                    "Pump it as fast as possible",
+                    "Use proper lifting points and raise slowly",
+                    "Never check the vehicle's stability",
+                    "Leave it unattended while raised"
+                ],
+                correct: 1
+            },
+            {
+                question: "Vehicle fluids should be disposed of:",
+                answers: [
+                    "In the regular trash",
+                    "Down the drain",
+                    "In proper recycling containers according to regulations",
+                    "Outside behind the building"
+                ],
+                correct: 2
+            },
+            {
+                question: "When moving a running vehicle in the shop, you should:",
+                answers: [
+                    "Have someone guide you and move very slowly",
+                    "Drive at normal speed to save time",
+                    "Not worry about pedestrians",
+                    "Keep doors and windows closed"
+                ],
+                correct: 0
+            },
+            {
+                question: "Hydraulic jacks should be:",
+                answers: [
+                    "Pumped to maximum pressure always",
+                    "Inspected regularly for leaks and proper operation",
+                    "Used on any surface",
+                    "Left under pressure when not in use"
+                ],
+                correct: 1
+            },
+            {
+                question: "When storing vehicle parts, you should:",
+                answers: [
+                    "Stack them as high as possible",
+                    "Store them securely to prevent falling",
+                    "Leave them anywhere convenient",
+                    "Stack heavy parts on top of light ones"
+                ],
+                correct: 1
+            },
+            {
+                question: "Class C fire extinguishers are used for:",
+                answers: [
+                    "Wood and paper fires",
+                    "Liquid fuel fires",
+                    "Electrical fires",
+                    "Metal fires"
+                ],
+                correct: 2
+            },
+            {
+                question: "When working around vehicle exhaust systems, you should:",
+                answers: [
+                    "Always ensure proper ventilation",
+                    "Work in enclosed spaces",
+                    "Ignore the smell of exhaust",
+                    "Run engines at high RPM"
+                ],
+                correct: 0
+            },
+            {
+                question: "Vehicle batteries should be:",
+                answers: [
+                    "Handled carelessly",
+                    "Carried by the terminals",
+                    "Lifted properly and kept upright",
+                    "Dropped when too heavy"
+                ],
+                correct: 2
+            },
+            {
+                question: "When cleaning parts with solvents, you should:",
+                answers: [
+                    "Work in a well-ventilated area with proper PPE",
+                    "Use them in confined spaces",
+                    "Mix different solvents together",
+                    "Never wear gloves"
+                ],
+                correct: 0
+            },
+            {
+                question: "Tire pressure should be checked:",
+                answers: [
+                    "When tires are hot from driving",
+                    "When tires are cold for accurate readings",
+                    "Only when tires look flat",
+                    "Never check tire pressure"
+                ],
+                correct: 1
             }
         ]
     },
@@ -438,6 +888,156 @@ const tests = {
                     "A welding hood"
                 ],
                 correct: 2
+            },
+            {
+                question: "When working on a cooling system, you should:",
+                answers: [
+                    "Remove the radiator cap immediately",
+                    "Wait for the engine to cool down completely",
+                    "Work on it while the engine is hot",
+                    "Never check the coolant level"
+                ],
+                correct: 1
+            },
+            {
+                question: "High voltage hybrid vehicle systems require:",
+                answers: [
+                    "No special precautions",
+                    "Proper training and insulated tools",
+                    "Regular household tools",
+                    "Working with wet hands"
+                ],
+                correct: 1
+            },
+            {
+                question: "When jump-starting a vehicle, you should:",
+                answers: [
+                    "Connect positive to negative terminals",
+                    "Connect cables in any order",
+                    "Follow proper sequence: positive to positive, negative to ground",
+                    "Touch the cable ends together first"
+                ],
+                correct: 2
+            },
+            {
+                question: "Brake fluid is dangerous because it:",
+                answers: [
+                    "Is flammable and can damage paint",
+                    "Is completely safe to handle",
+                    "Only affects metal surfaces",
+                    "Has no harmful effects"
+                ],
+                correct: 0
+            },
+            {
+                question: "When using an engine hoist, you should:",
+                answers: [
+                    "Lift as fast as possible",
+                    "Check weight limits and use proper lifting points",
+                    "Never inspect the equipment",
+                    "Work alone for efficiency"
+                ],
+                correct: 1
+            },
+            {
+                question: "Power steering fluid under pressure can:",
+                answers: [
+                    "Cause serious injury if it penetrates skin",
+                    "Be safely touched",
+                    "Only stain clothing",
+                    "Be used as a cleaning agent"
+                ],
+                correct: 0
+            },
+            {
+                question: "When working with fuel injection systems, you should:",
+                answers: [
+                    "Ignore fuel pressure",
+                    "Relieve fuel pressure before disconnecting lines",
+                    "Work with the engine running",
+                    "Use open flames nearby"
+                ],
+                correct: 1
+            },
+            {
+                question: "Catalytic converters can reach temperatures of:",
+                answers: [
+                    "100°F (38°C)",
+                    "200°F (93°C)",
+                    "Over 1,000°F (538°C)",
+                    "Room temperature"
+                ],
+                correct: 2
+            },
+            {
+                question: "When using a trouble light, you should:",
+                answers: [
+                    "Use any household bulb",
+                    "Use a properly insulated, low-voltage LED light",
+                    "Use bare bulbs for better lighting",
+                    "Use lights with damaged cords"
+                ],
+                correct: 1
+            },
+            {
+                question: "Transmission fluid should be checked:",
+                answers: [
+                    "While the engine is off and cold",
+                    "With the engine running and transmission warm",
+                    "Only when problems occur",
+                    "Never check transmission fluid"
+                ],
+                correct: 1
+            },
+            {
+                question: "When removing an engine oil drain plug, you should:",
+                answers: [
+                    "Let the hot oil splash freely",
+                    "Position a drain pan and allow for hot oil flow",
+                    "Remove it as quickly as possible",
+                    "Not worry about the oil temperature"
+                ],
+                correct: 1
+            },
+            {
+                question: "Air conditioning refrigerant can:",
+                answers: [
+                    "Cause frostbite and should be handled by certified technicians",
+                    "Be released into the atmosphere freely",
+                    "Be safely touched with bare hands",
+                    "Be mixed with other chemicals"
+                ],
+                correct: 0
+            },
+            {
+                question: "When using a tire machine, you should:",
+                answers: [
+                    "Never use tire lubricant",
+                    "Follow proper procedures and keep hands clear of pinch points",
+                    "Work as fast as possible",
+                    "Stand directly in front of the tire"
+                ],
+                correct: 1
+            },
+            {
+                question: "Diesel fuel is dangerous because it:",
+                answers: [
+                    "Is completely safe",
+                    "Can cause skin irritation and is a fire hazard",
+                    "Is only dangerous when hot",
+                    "Never causes any problems"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before working on any vehicle, you should:",
+                answers: [
+                    "Start working immediately",
+                    "Identify potential hazards and plan your work",
+                    "Assume everything is safe",
+                    "Work as fast as possible"
+                ],
+                correct: 1
             }
         ]
     },
@@ -542,6 +1142,156 @@ const tests = {
                     "Keep your mind on the work"
                 ],
                 correct: 1
+            },
+            {
+                question: "When using a welder, you should:",
+                answers: [
+                    "Look directly at the welding arc",
+                    "Wear proper welding helmet, gloves, and protective clothing",
+                    "Weld in poorly ventilated areas",
+                    "Never check for gas leaks"
+                ],
+                correct: 1
+            },
+            {
+                question: "Grinding sparks can travel up to:",
+                answers: [
+                    "2 feet",
+                    "5 feet",
+                    "35 feet or more",
+                    "They don't travel far"
+                ],
+                correct: 2
+            },
+            {
+                question: "When using an oxy-acetylene torch, you should:",
+                answers: [
+                    "Light the acetylene first, then add oxygen",
+                    "Light the oxygen first, then add acetylene",
+                    "Light both gases simultaneously",
+                    "Use a cigarette lighter to ignite"
+                ],
+                correct: 0
+            },
+            {
+                question: "Machine guards should:",
+                answers: [
+                    "Be removed for easier access",
+                    "Always be in place during operation",
+                    "Only be used by beginners",
+                    "Be removed when working quickly"
+                ],
+                correct: 1
+            },
+            {
+                question: "Before operating any machinery, you should:",
+                answers: [
+                    "Start it immediately",
+                    "Read the manual and receive proper training",
+                    "Ask another student to show you",
+                    "Figure it out as you go"
+                ],
+                correct: 1
+            },
+            {
+                question: "Loose clothing around rotating machinery can:",
+                answers: [
+                    "Get caught and cause serious injury",
+                    "Help keep you warm",
+                    "Make you look professional",
+                    "Never cause problems"
+                ],
+                correct: 0
+            },
+            {
+                question: "When working with solvents, you should:",
+                answers: [
+                    "Work in confined spaces",
+                    "Use maximum amounts for better cleaning",
+                    "Ensure adequate ventilation and wear appropriate PPE",
+                    "Mix different solvents together"
+                ],
+                correct: 2
+            },
+            {
+                question: "Extension cords in the shop should be:",
+                answers: [
+                    "Inspected regularly for damage",
+                    "Left on the floor where people walk",
+                    "Used even if damaged",
+                    "Connected together indefinitely"
+                ],
+                correct: 0
+            },
+            {
+                question: "When lifting heavy automotive parts, you should:",
+                answers: [
+                    "Lift alone to show your strength",
+                    "Get help and use proper lifting equipment",
+                    "Bend your back and lift quickly",
+                    "Twist while lifting"
+                ],
+                correct: 1
+            },
+            {
+                question: "Compressed air should never be:",
+                answers: [
+                    "Used to clean parts",
+                    "Used to blow dirt off clothing or skin",
+                    "Used with proper pressure regulators",
+                    "Used in well-ventilated areas"
+                ],
+                correct: 1
+            },
+            {
+                question: "When servicing air conditioning systems, you should:",
+                answers: [
+                    "Release refrigerant into the atmosphere",
+                    "Use proper recovery equipment and be EPA certified",
+                    "Work without protective equipment",
+                    "Mix different types of refrigerant"
+                ],
+                correct: 1
+            },
+            {
+                question: "Proper shop lighting is important because:",
+                answers: [
+                    "It looks professional",
+                    "It prevents eye strain and reduces accidents",
+                    "It uses more electricity",
+                    "It makes the shop warmer"
+                ],
+                correct: 1
+            },
+            {
+                question: "When working late or when tired, you should:",
+                answers: [
+                    "Use stimulants to stay alert",
+                    "Work extra carefully and take frequent breaks",
+                    "Work faster to finish quickly",
+                    "Ignore safety procedures"
+                ],
+                correct: 1
+            },
+            {
+                question: "Shop housekeeping is important for safety because:",
+                answers: [
+                    "It looks good to visitors",
+                    "Clean areas prevent slips, trips, and falls",
+                    "It's required by law only",
+                    "It makes tools easier to lose"
+                ],
+                correct: 1
+            },
+            {
+                question: "The most important aspect of automotive shop safety is:",
+                answers: [
+                    "Working as fast as possible",
+                    "Having the newest equipment",
+                    "Being constantly aware and following all safety procedures",
+                    "Impressing other students"
+                ],
+                correct: 2
             }
         ]
     }
