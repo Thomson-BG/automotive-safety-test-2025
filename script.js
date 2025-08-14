@@ -549,9 +549,33 @@ const tests = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    loadProgress();
-    setupEventListeners();
+    showSplashScreen();
 });
+
+function showSplashScreen() {
+    const splashScreen = document.getElementById('splash-screen');
+    const typewriterText = document.getElementById('typewriter-text');
+    const text = 'BULLDOG GARAGE SAFETY TEST';
+    
+    splashScreen.style.display = 'flex';
+    
+    let i = 0;
+    const typewriterInterval = setInterval(() => {
+        typewriterText.textContent = text.substring(0, i + 1);
+        i++;
+        
+        if (i >= text.length) {
+            clearInterval(typewriterInterval);
+            
+            // Hide splash screen after 2 seconds of complete text
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                loadProgress();
+                setupEventListeners();
+            }, 2000);
+        }
+    }, 300); // Adjust speed of typing (300ms between characters)
+}
 
 function setupEventListeners() {
     // Student form submission
@@ -602,58 +626,62 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
-    currentTest = testNumber;
-    currentQuestion = 0;
-    currentAnswers = [];
-    shuffledQuestions = [];
-    originalCorrectAnswers = [];
-    
-    const test = tests[testNumber];
-    if (!test) {
-        alert('This test is not yet available.');
-        return;
-    }
-    
-    // Create a shuffled copy of questions
-    shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
-        // For each question, shuffle the answers and update correct answer indices
-        const shuffledAnswers = [...q.answers];
-        const answerMapping = shuffledAnswers.map((_, i) => i);
+    // Show loading screen first
+    showTestLoadingScreen(() => {
+        // This callback runs after loading is complete
+        currentTest = testNumber;
+        currentQuestion = 0;
+        currentAnswers = [];
+        shuffledQuestions = [];
+        originalCorrectAnswers = [];
         
-        // Shuffle answer mapping
-        for (let i = answerMapping.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+        const test = tests[testNumber];
+        if (!test) {
+            alert('This test is not yet available.');
+            return;
         }
         
-        // Apply shuffling to answers
-        const newAnswers = answerMapping.map(i => q.answers[i]);
+        // Create a shuffled copy of questions
+        shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
+            // For each question, shuffle the answers and update correct answer indices
+            const shuffledAnswers = [...q.answers];
+            const answerMapping = shuffledAnswers.map((_, i) => i);
+            
+            // Shuffle answer mapping
+            for (let i = answerMapping.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+            }
+            
+            // Apply shuffling to answers
+            const newAnswers = answerMapping.map(i => q.answers[i]);
+            
+            // Update correct answer indices based on new positions
+            let newCorrect;
+            if (q.multiple) {
+                newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
+            } else {
+                newCorrect = answerMapping.indexOf(q.correct);
+            }
+            
+            return {
+                ...q,
+                answers: newAnswers,
+                correct: newCorrect,
+                originalIndex: index
+            };
+        }));
         
-        // Update correct answer indices based on new positions
-        let newCorrect;
-        if (q.multiple) {
-            newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
-        } else {
-            newCorrect = answerMapping.indexOf(q.correct);
-        }
+        // Shuffle the questions themselves
+        shuffledQuestions = shuffleArray(shuffledQuestions);
         
-        return {
-            ...q,
-            answers: newAnswers,
-            correct: newCorrect,
-            originalIndex: index
-        };
-    }));
-    
-    // Shuffle the questions themselves
-    shuffledQuestions = shuffleArray(shuffledQuestions);
-    
-    // Store the original correct answers for scoring
-    originalCorrectAnswers = new Array(shuffledQuestions.length);
-    
-    document.getElementById('quiz-title').textContent = test.title;
-    showSection('quiz');
-    displayQuestion();
+        // Store the original correct answers for scoring
+        originalCorrectAnswers = new Array(shuffledQuestions.length);
+        
+        document.getElementById('quiz-title').textContent = test.title;
+        showSection('quiz');
+        displayQuestion();
+    });
 }
 
 function displayQuestion() {
@@ -1545,3 +1573,39 @@ setInterval(function() {
         devtools.open = false;
     }
 }, 500);
+
+// Loading screen functionality
+function showTestLoadingScreen(callback) {
+    const loadingScreen = document.getElementById('test-loading-screen');
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingPercentage = document.getElementById('loading-percentage');
+    
+    // Random duration between 5-12 seconds
+    const duration = Math.random() * 7000 + 5000; // 5000ms + 0-7000ms = 5-12 seconds
+    
+    loadingScreen.style.display = 'flex';
+    
+    let startTime = Date.now();
+    let currentPercentage = 0;
+    
+    const updateLoading = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        currentPercentage = Math.floor(progress * 100);
+        
+        loadingBar.style.width = currentPercentage + '%';
+        loadingPercentage.textContent = currentPercentage + '%';
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateLoading);
+        } else {
+            // Loading complete
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                callback();
+            }, 500); // Small delay to show 100%
+        }
+    };
+    
+    updateLoading();
+}
