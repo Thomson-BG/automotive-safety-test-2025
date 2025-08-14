@@ -816,12 +816,22 @@ function showCompletionModal(percentage) {
     modal.id = 'completion-modal';
     modal.style.display = 'block';
     
+    // Create different button sets based on score
+    const buttonHTML = percentage === 100 
+        ? `<button class="btn-primary" onclick="closeCompletionModal(${percentage})">Continue</button>`
+        : `
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeCompletionModal(${percentage})">Continue</button>
+                <button class="btn-retake" onclick="retakeQuiz()">Retake Quiz</button>
+            </div>
+          `;
+    
     modal.innerHTML = `
         <div class="modal-content">
             <h3>Test Completed!</h3>
             <p>Your score: ${percentage}%</p>
             <p>${percentage === 100 ? 'Congratulations! You passed!' : 'You need 100% to pass. Please try again.'}</p>
-            <button class="btn-primary" onclick="closeCompletionModal(${percentage})">Continue</button>
+            ${buttonHTML}
         </div>
     `;
     
@@ -836,6 +846,17 @@ function closeCompletionModal(percentage) {
     
     // Show results after modal is closed
     showResults(percentage);
+}
+
+function retakeQuiz() {
+    // Close the completion modal
+    const modal = document.getElementById('completion-modal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restart the current test
+    startTest(currentTest);
 }
 
 function showResults(percentage) {
@@ -1070,26 +1091,27 @@ function generateCertificate() {
     ctx.font = '12px serif';
     ctx.fillStyle = '#000000';
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
-    
-    // Add seal (moved down to about an inch above the date)
-    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
 }
 
 function addWatermarks(ctx, width, height) {
     ctx.save();
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = 0.25; // More visible watermark
     ctx.fillStyle = '#cccccc';
-    ctx.font = 'bold 16px serif';
+    ctx.font = 'bold 48px serif'; // Much bigger font
     ctx.textAlign = 'center';
     
-    // Add exactly 5 strategic watermarks for professional look
+    // Strategic watermarks overlaying critical student information areas
     const watermarkText = 'BULLDOG GARAGE SAFETY';
     const positions = [
-        {x: width * 0.25, y: height * 0.35, rotation: -Math.PI / 12},
-        {x: width * 0.75, y: height * 0.35, rotation: Math.PI / 12},
-        {x: width * 0.3, y: height * 0.6, rotation: -Math.PI / 10},
-        {x: width * 0.7, y: height * 0.6, rotation: Math.PI / 10},
-        {x: width * 0.5, y: height * 0.8, rotation: 0}
+        // Over student name area (y=250)
+        {x: width * 0.5, y: 250, rotation: -Math.PI / 8},
+        // Over email area (y=420) 
+        {x: width * 0.5, y: 420, rotation: Math.PI / 8},
+        // Additional coverage over student ID area
+        {x: width * 0.3, y: 280, rotation: -Math.PI / 6},
+        {x: width * 0.7, y: 280, rotation: Math.PI / 6},
+        // Background coverage
+        {x: width * 0.5, y: height * 0.6, rotation: 0}
     ];
     
     positions.forEach(pos => {
@@ -1556,9 +1578,6 @@ function generateCertificateOnCanvas(ctx, canvas) {
     ctx.font = '12px serif';
     ctx.fillStyle = '#000000';
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
-    
-    // Add seal (moved down to about an inch above the date)
-    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
 }
 
 // Detect if developer tools are open (basic detection)
