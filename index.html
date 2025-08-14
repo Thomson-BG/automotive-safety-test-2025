@@ -188,6 +188,16 @@
             </div>
         </div>
 
+        <!-- Tests Locked Modal -->
+        <div id="tests-locked-modal" class="modal">
+            <div class="modal-content">
+                <h3>Tests Currently Unavailable</h3>
+                <p>Tests are only accessible while in class.</p>
+                <p>Please check with your instructor for test availability.</p>
+                <button class="btn-primary" onclick="closeTestsLockedModal()">OK</button>
+            </div>
+        </div>
+
         <!-- Admin Dashboard Section -->
         <section id="admin-dashboard" class="section">
             <div class="admin-container">
@@ -199,6 +209,7 @@
                 <div class="admin-tabs">
                     <button class="tab-btn active" onclick="showAdminTab('questions')">Manage Questions</button>
                     <button class="tab-btn" onclick="showAdminTab('certificate')">View Certificate</button>
+                    <button class="tab-btn" onclick="showAdminTab('settings')">Test Settings</button>
                 </div>
 
                 <div id="admin-questions" class="admin-tab-content active">
@@ -227,6 +238,23 @@
                     <button class="btn-primary" onclick="viewExampleCertificate()">Generate Example Certificate</button>
                     <div id="admin-certificate-content">
                         <canvas id="admin-certificate-canvas" width="800" height="600"></canvas>
+                    </div>
+                </div>
+
+                <div id="admin-settings" class="admin-tab-content">
+                    <h3>Test Access Settings</h3>
+                    <div class="settings-container">
+                        <div class="setting-item">
+                            <h4>Test Access Control</h4>
+                            <p>Control whether students can access tests. When locked, students will see a message that tests are only accessible while in class.</p>
+                            <div class="toggle-container">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="tests-unlocked-toggle" onchange="toggleTestAccess()" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span id="test-status-text" class="status-text">Tests are UNLOCKED</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
