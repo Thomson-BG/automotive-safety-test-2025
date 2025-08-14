@@ -119,8 +119,14 @@
                     <div class="answers" id="answers"></div>
                 </div>
                 <div class="quiz-controls">
-                    <button id="next-btn" class="btn-primary" onclick="nextQuestion()">Next</button>
-                    <button id="submit-btn" class="btn-primary" onclick="submitTest()" style="display: none;">Submit Test</button>
+                    <button id="back-btn" class="btn-back" onclick="backToMenu()">
+                        <span class="back-arrow">←</span>
+                        BACK
+                    </button>
+                    <div class="quiz-nav-buttons">
+                        <button id="next-btn" class="btn-primary" onclick="nextQuestion()">Next</button>
+                        <button id="submit-btn" class="btn-primary" onclick="submitTest()" style="display: none;">Submit Test</button>
+                    </div>
                 </div>
             </div>
         </section>

@@ -346,7 +346,44 @@ header h1 {
 }
 
 .quiz-controls {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.quiz-nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-back {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid #d32f2f;
+}
+
+.btn-back:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+
+.back-arrow {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: none;
 }
 
 /* Results Styles */
@@ -640,6 +677,24 @@ footer {
     gap: 10px;
     justify-content: flex-end;
     margin-top: 20px;
+}
+
+.btn-retake {
+    background-color: #ff9800;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-retake:hover {
+    background-color: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
 }
 
 #admin-certificate-content {
