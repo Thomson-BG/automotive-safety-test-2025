@@ -549,15 +549,50 @@ const tests = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    loadProgress();
-    setupEventListeners();
+    showSplashScreen();
 });
+
+function showSplashScreen() {
+    const splashScreen = document.getElementById('splash-screen');
+    const typewriterText = document.getElementById('typewriter-text');
+    const text = 'BULLDOG GARAGE SAFETY TEST';
+    
+    splashScreen.style.display = 'flex';
+    
+    let i = 0;
+    const typewriterInterval = setInterval(() => {
+        typewriterText.textContent = text.substring(0, i + 1);
+        i++;
+        
+        if (i >= text.length) {
+            clearInterval(typewriterInterval);
+            
+            // Hide splash screen after 2 seconds of complete text
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                loadProgress();
+                setupEventListeners();
+            }, 2000);
+        }
+    }, 300); // Adjust speed of typing (300ms between characters)
+}
 
 function setupEventListeners() {
     // Student form submission
     document.getElementById('student-form').addEventListener('submit', function(e) {
         e.preventDefault();
         submitStudentForm();
+    });
+    
+    // Admin login button
+    document.getElementById('admin-login-btn').addEventListener('click', function() {
+        showAdminLoginModal();
+    });
+    
+    // Admin login form
+    document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitAdminLogin();
     });
 }
 
@@ -591,58 +626,62 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
-    currentTest = testNumber;
-    currentQuestion = 0;
-    currentAnswers = [];
-    shuffledQuestions = [];
-    originalCorrectAnswers = [];
-    
-    const test = tests[testNumber];
-    if (!test) {
-        alert('This test is not yet available.');
-        return;
-    }
-    
-    // Create a shuffled copy of questions
-    shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
-        // For each question, shuffle the answers and update correct answer indices
-        const shuffledAnswers = [...q.answers];
-        const answerMapping = shuffledAnswers.map((_, i) => i);
+    // Show loading screen first
+    showTestLoadingScreen(() => {
+        // This callback runs after loading is complete
+        currentTest = testNumber;
+        currentQuestion = 0;
+        currentAnswers = [];
+        shuffledQuestions = [];
+        originalCorrectAnswers = [];
         
-        // Shuffle answer mapping
-        for (let i = answerMapping.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+        const test = tests[testNumber];
+        if (!test) {
+            alert('This test is not yet available.');
+            return;
         }
         
-        // Apply shuffling to answers
-        const newAnswers = answerMapping.map(i => q.answers[i]);
+        // Create a shuffled copy of questions
+        shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
+            // For each question, shuffle the answers and update correct answer indices
+            const shuffledAnswers = [...q.answers];
+            const answerMapping = shuffledAnswers.map((_, i) => i);
+            
+            // Shuffle answer mapping
+            for (let i = answerMapping.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+            }
+            
+            // Apply shuffling to answers
+            const newAnswers = answerMapping.map(i => q.answers[i]);
+            
+            // Update correct answer indices based on new positions
+            let newCorrect;
+            if (q.multiple) {
+                newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
+            } else {
+                newCorrect = answerMapping.indexOf(q.correct);
+            }
+            
+            return {
+                ...q,
+                answers: newAnswers,
+                correct: newCorrect,
+                originalIndex: index
+            };
+        }));
         
-        // Update correct answer indices based on new positions
-        let newCorrect;
-        if (q.multiple) {
-            newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
-        } else {
-            newCorrect = answerMapping.indexOf(q.correct);
-        }
+        // Shuffle the questions themselves
+        shuffledQuestions = shuffleArray(shuffledQuestions);
         
-        return {
-            ...q,
-            answers: newAnswers,
-            correct: newCorrect,
-            originalIndex: index
-        };
-    }));
-    
-    // Shuffle the questions themselves
-    shuffledQuestions = shuffleArray(shuffledQuestions);
-    
-    // Store the original correct answers for scoring
-    originalCorrectAnswers = new Array(shuffledQuestions.length);
-    
-    document.getElementById('quiz-title').textContent = test.title;
-    showSection('quiz');
-    displayQuestion();
+        // Store the original correct answers for scoring
+        originalCorrectAnswers = new Array(shuffledQuestions.length);
+        
+        document.getElementById('quiz-title').textContent = test.title;
+        showSection('quiz');
+        displayQuestion();
+    });
 }
 
 function displayQuestion() {
@@ -1038,42 +1077,28 @@ function generateCertificate() {
 
 function addWatermarks(ctx, width, height) {
     ctx.save();
-    ctx.globalAlpha = 0.15;
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 18px serif';
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#cccccc';
+    ctx.font = 'bold 16px serif';
     ctx.textAlign = 'center';
     
-    // Add multiple watermarks across the certificate, especially over text areas
+    // Add exactly 5 strategic watermarks for professional look
     const watermarkText = 'BULLDOG GARAGE SAFETY';
+    const positions = [
+        {x: width * 0.25, y: height * 0.35, rotation: -Math.PI / 12},
+        {x: width * 0.75, y: height * 0.35, rotation: Math.PI / 12},
+        {x: width * 0.3, y: height * 0.6, rotation: -Math.PI / 10},
+        {x: width * 0.7, y: height * 0.6, rotation: Math.PI / 10},
+        {x: width * 0.5, y: height * 0.8, rotation: 0}
+    ];
     
-    // Cover the main text area more densely
-    for (let x = 80; x < width - 80; x += 120) {
-        for (let y = 150; y < height - 100; y += 80) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(-Math.PI / 8);
-            ctx.fillText(watermarkText, 0, 0);
-            ctx.restore();
-        }
-    }
-    
-    // Add extra watermarks over student name area
-    for (let x = 200; x < 600; x += 100) {
+    positions.forEach(pos => {
         ctx.save();
-        ctx.translate(x, 200);
-        ctx.rotate(Math.PI / 12);
+        ctx.translate(pos.x, pos.y);
+        ctx.rotate(pos.rotation);
         ctx.fillText(watermarkText, 0, 0);
         ctx.restore();
-    }
-    
-    // Add watermarks over email area
-    for (let x = 200; x < 600; x += 110) {
-        ctx.save();
-        ctx.translate(x, 380);
-        ctx.rotate(-Math.PI / 10);
-        ctx.fillText(watermarkText, 0, 0);
-        ctx.restore();
-    }
+    });
     
     ctx.restore();
 }
@@ -1081,44 +1106,67 @@ function addWatermarks(ctx, width, height) {
 function drawSeal(ctx, x, y) {
     const radius = 60;
     
-    // Create a more realistic gold seal with metallic effect
+    // Create a realistic gold seal with proper metallic lighting and shadows
     
-    // Outer shadow for depth
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    // Multiple shadow layers for depth
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.beginPath();
-    ctx.arc(x + 3, y + 3, radius, 0, 2 * Math.PI);
+    ctx.arc(x + 4, y + 4, radius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Outer circle (darker gold for edge)
-    ctx.fillStyle = '#b8860b';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.arc(x + 2, y + 2, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Create gradient effect for metallic look
+    const gradient = ctx.createRadialGradient(x - 20, y - 20, 0, x, y, radius);
+    gradient.addColorStop(0, '#ffd700');
+    gradient.addColorStop(0.3, '#d4af37');
+    gradient.addColorStop(0.6, '#b8860b');
+    gradient.addColorStop(1, '#8b6914');
+    
+    // Main seal circle
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Main gold circle with gradient effect
-    ctx.fillStyle = '#d4af37';
+    // Add metallic rim with highlights
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(x, y, radius - 5, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.arc(x, y, radius - 2, 0, 2 * Math.PI);
+    ctx.stroke();
     
-    // Inner raised rim
-    ctx.fillStyle = '#ffd700';
+    // Inner raised rim with highlight
+    const innerGradient = ctx.createRadialGradient(x - 15, y - 15, 0, x, y, radius - 10);
+    innerGradient.addColorStop(0, '#fff700');
+    innerGradient.addColorStop(0.5, '#ffd700');
+    innerGradient.addColorStop(1, '#d4af37');
+    
+    ctx.fillStyle = innerGradient;
     ctx.beginPath();
     ctx.arc(x, y, radius - 10, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Central pressed area (slightly darker)
-    ctx.fillStyle = '#daa520';
+    // Central pressed area with realistic depression
+    const centralGradient = ctx.createRadialGradient(x, y, 0, x, y, radius - 18);
+    centralGradient.addColorStop(0, '#b8860b');
+    centralGradient.addColorStop(0.8, '#d4af37');
+    centralGradient.addColorStop(1, '#ffd700');
+    
+    ctx.fillStyle = centralGradient;
     ctx.beginPath();
     ctx.arc(x, y, radius - 18, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Add embossed ridges around the rim for realistic effect
-    ctx.strokeStyle = '#b8860b';
-    ctx.lineWidth = 1;
-    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 12) {
-        const startRadius = radius - 15;
-        const endRadius = radius - 8;
+    // Add embossed ridges around the rim for texture
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 1.5;
+    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 16) {
+        const startRadius = radius - 8;
+        const endRadius = radius - 3;
         const startX = x + Math.cos(angle) * startRadius;
         const startY = y + Math.sin(angle) * startRadius;
         const endX = x + Math.cos(angle) * endRadius;
@@ -1130,37 +1178,52 @@ function drawSeal(ctx, x, y) {
         ctx.stroke();
     }
     
-    // Central text "BULLDOG" and "GARAGE" pressed into the seal
-    ctx.fillStyle = '#b8860b'; // Darker for pressed effect
-    ctx.font = 'bold 12px serif';
+    // Central text with embossed effect
+    ctx.fillStyle = '#654321';
+    ctx.font = 'bold 11px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('BULLDOG', x, y - 8);
-    ctx.fillText('GARAGE', x, y + 8);
+    ctx.fillText('BULLDOG', x + 1, y - 7);
+    ctx.fillText('GARAGE', x + 1, y + 9);
     
-    // Add decorative stars around the text
-    ctx.fillStyle = '#b8860b';
+    // Highlight on text for embossed look
+    ctx.fillStyle = '#fff4e6';
+    ctx.fillText('BULLDOG', x - 0.5, y - 8);
+    ctx.fillText('GARAGE', x - 0.5, y + 8);
+    
+    // Add decorative elements
+    ctx.fillStyle = '#8b6914';
     const starPositions = [
-        {x: x - 25, y: y - 20},
-        {x: x + 25, y: y - 20},
-        {x: x - 25, y: y + 20},
-        {x: x + 25, y: y + 20}
+        {x: x - 28, y: y - 18},
+        {x: x + 28, y: y - 18},
+        {x: x - 28, y: y + 22},
+        {x: x + 28, y: y + 22}
     ];
     
     starPositions.forEach(star => {
-        drawStar(ctx, star.x, star.y, 4, 2, 1.5);
+        drawStar(ctx, star.x, star.y, 5, 3, 1.5);
     });
     
-    // Outer text ring
-    ctx.fillStyle = '#8b7355';
-    ctx.font = 'bold 8px serif';
+    // Outer text ring with shadow
+    ctx.fillStyle = '#4a4a4a';
+    ctx.font = 'bold 7px serif';
     ctx.textAlign = 'center';
+    ctx.fillText('HEMET HIGH SCHOOL', x + 0.5, y + 36);
+    ctx.fillText('OFFICIAL SEAL', x + 0.5, y + 46);
+    
+    // Highlight on outer text
+    ctx.fillStyle = '#2c2c2c';
     ctx.fillText('HEMET HIGH SCHOOL', x, y + 35);
     ctx.fillText('OFFICIAL SEAL', x, y + 45);
     
-    // Add some highlight for 3D effect
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Add realistic highlight for 3D metallic effect
+    const highlightGradient = ctx.createRadialGradient(x - 20, y - 20, 0, x - 10, y - 10, radius - 10);
+    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    highlightGradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)');
+    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    ctx.fillStyle = highlightGradient;
     ctx.beginPath();
-    ctx.arc(x - 15, y - 15, radius - 20, 0, Math.PI);
+    ctx.arc(x - 15, y - 15, radius - 15, 0, Math.PI * 1.5);
     ctx.fill();
 }
 
@@ -1232,6 +1295,272 @@ document.addEventListener('contextmenu', function(e) {
     return false;
 });
 
+// Admin functionality
+let isAdminLoggedIn = false;
+
+function showAdminLoginModal() {
+    document.getElementById('admin-login-modal').style.display = 'block';
+}
+
+function closeAdminLoginModal() {
+    document.getElementById('admin-login-modal').style.display = 'none';
+    document.getElementById('admin-login-form').reset();
+}
+
+function submitAdminLogin() {
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    
+    if (username === 'Thomson' && password === 'Bulldog!1') {
+        isAdminLoggedIn = true;
+        closeAdminLoginModal();
+        showSection('admin-dashboard');
+        loadTestQuestions();
+    } else {
+        alert('Invalid credentials. Please try again.');
+        document.getElementById('admin-password').value = '';
+    }
+}
+
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    showSection('registration');
+}
+
+function showAdminTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(`admin-${tabName}`).classList.add('active');
+    
+    // Add active class to clicked tab button
+    event.target.classList.add('active');
+    
+    if (tabName === 'questions') {
+        loadTestQuestions();
+    }
+}
+
+function loadTestQuestions() {
+    const selectedTest = document.getElementById('admin-test-select').value;
+    const questionsList = document.getElementById('questions-list');
+    
+    if (!tests[selectedTest]) return;
+    
+    questionsList.innerHTML = '';
+    
+    tests[selectedTest].questions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <h4>Question ${index + 1}</h4>
+            <p><strong>${question.question}</strong></p>
+            <div class="answers">
+                ${question.answers.map((answer, ansIndex) => `
+                    <div class="answer ${ansIndex === question.correct ? 'correct' : ''}">
+                        ${ansIndex === question.correct ? '✓ ' : ''}${answer}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="question-actions">
+                <button class="btn-edit" onclick="editQuestion(${selectedTest}, ${index})">Edit</button>
+                <button class="btn-delete" onclick="deleteQuestion(${selectedTest}, ${index})">Delete</button>
+            </div>
+        `;
+        questionsList.appendChild(questionDiv);
+    });
+}
+
+function editQuestion(testNum, questionIndex) {
+    // For this implementation, we'll just show an alert
+    // In a full implementation, this would open an edit form
+    const question = tests[testNum].questions[questionIndex];
+    const newQuestion = prompt('Edit question:', question.question);
+    
+    if (newQuestion && newQuestion.trim()) {
+        tests[testNum].questions[questionIndex].question = newQuestion.trim();
+        loadTestQuestions();
+        alert('Question updated successfully!');
+    }
+}
+
+function deleteQuestion(testNum, questionIndex) {
+    if (confirm('Are you sure you want to delete this question?')) {
+        tests[testNum].questions.splice(questionIndex, 1);
+        loadTestQuestions();
+        alert('Question deleted successfully!');
+    }
+}
+
+function addNewQuestion() {
+    const selectedTest = document.getElementById('admin-test-select').value;
+    const question = prompt('Enter new question:');
+    
+    if (question && question.trim()) {
+        const answers = [];
+        for (let i = 0; i < 4; i++) {
+            const answer = prompt(`Enter answer ${i + 1}:`);
+            if (answer && answer.trim()) {
+                answers.push(answer.trim());
+            } else {
+                alert('All 4 answers are required.');
+                return;
+            }
+        }
+        
+        const correctIndex = parseInt(prompt('Enter the number of the correct answer (1-4):')) - 1;
+        
+        if (correctIndex >= 0 && correctIndex < 4) {
+            tests[selectedTest].questions.push({
+                question: question.trim(),
+                answers: answers,
+                correct: correctIndex
+            });
+            loadTestQuestions();
+            alert('Question added successfully!');
+        } else {
+            alert('Invalid correct answer number.');
+        }
+    }
+}
+
+function viewExampleCertificate() {
+    const canvas = document.getElementById('admin-certificate-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Save current student data
+    const originalStudentData = { ...studentData };
+    
+    // Set example data
+    studentData = {
+        firstName: 'Bulldog',
+        lastName: 'Garage',
+        email: 'jthomson@hemetusd.org',
+        studentId: '123456'
+    };
+    
+    // Generate certificate with example data
+    generateCertificateOnCanvas(ctx, canvas);
+    
+    // Restore original student data
+    studentData = originalStudentData;
+}
+
+function generateCertificateOnCanvas(ctx, canvas) {
+    // Set canvas size
+    canvas.width = 800;
+    canvas.height = 600;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add watermarks
+    addWatermarks(ctx, canvas.width, canvas.height);
+    
+    // Border
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+    
+    // Inner border
+    ctx.strokeStyle = '#8b7355';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+    
+    // Title
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 36px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 120);
+    
+    // Decorative line
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(200, 140);
+    ctx.lineTo(600, 140);
+    ctx.stroke();
+    
+    // Main text
+    ctx.font = '20px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('This certificate hereby confirms that', canvas.width / 2, 200);
+    
+    // Student name in fancy cursive/calligraphy with student ID
+    ctx.font = 'italic 32px cursive';
+    ctx.fillStyle = '#2c3e50';
+    const studentNameText = `${studentData.firstName} ${studentData.lastName} #${studentData.studentId}`;
+    ctx.fillText(studentNameText, canvas.width / 2, 250);
+    
+    // Continue with rest of text
+    ctx.font = '20px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('has successfully passed the Bulldog Garage Safety Test', canvas.width / 2, 290);
+    ctx.fillText('with 100% accuracy.', canvas.width / 2, 330);
+    
+    // Email
+    ctx.font = '16px serif';
+    ctx.fillText(studentData.email, canvas.width / 2, 420);
+    
+    // Date (Los Angeles timezone)
+    const now = new Date();
+    const losAngelesTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+    const dateStr = losAngelesTime.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    ctx.textAlign = 'right';
+    ctx.fillText(dateStr, canvas.width - 60, canvas.height - 60);
+    
+    // Signature section
+    ctx.textAlign = 'left';
+    ctx.font = '14px serif';
+    ctx.fillText('By issuance of this certificate, I hereby acknowledge', 60, canvas.height - 140);
+    ctx.fillText('this student has satisfied the requirements for the Safety Test.', 60, canvas.height - 120);
+    
+    // Signature line
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(60, canvas.height - 80);
+    ctx.lineTo(260, canvas.height - 80);
+    ctx.stroke();
+    
+    // Signature
+    ctx.font = 'italic 24px cursive';
+    ctx.fillStyle = '#000080';
+    ctx.fillText('JT', 140, canvas.height - 85);
+    
+    // Circle around signature
+    ctx.strokeStyle = '#000080';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(150, canvas.height - 90, 25, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    // Name under signature
+    ctx.font = '12px serif';
+    ctx.fillStyle = '#000000';
+    ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
+    
+    // Add seal (moved down to about an inch above the date)
+    drawSeal(ctx, canvas.width - 150, canvas.height - 120);
+}
+
 // Detect if developer tools are open (basic detection)
 let devtools = {open: false};
 setInterval(function() {
@@ -1244,3 +1573,39 @@ setInterval(function() {
         devtools.open = false;
     }
 }, 500);
+
+// Loading screen functionality
+function showTestLoadingScreen(callback) {
+    const loadingScreen = document.getElementById('test-loading-screen');
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingPercentage = document.getElementById('loading-percentage');
+    
+    // Random duration between 5-12 seconds
+    const duration = Math.random() * 7000 + 5000; // 5000ms + 0-7000ms = 5-12 seconds
+    
+    loadingScreen.style.display = 'flex';
+    
+    let startTime = Date.now();
+    let currentPercentage = 0;
+    
+    const updateLoading = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        currentPercentage = Math.floor(progress * 100);
+        
+        loadingBar.style.width = currentPercentage + '%';
+        loadingPercentage.textContent = currentPercentage + '%';
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateLoading);
+        } else {
+            // Loading complete
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                callback();
+            }, 500); // Small delay to show 100%
+        }
+    };
+    
+    updateLoading();
+}
