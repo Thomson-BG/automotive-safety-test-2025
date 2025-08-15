@@ -7,6 +7,9 @@ let currentAnswers = [];
 let shuffledQuestions = [];
 let originalCorrectAnswers = [];
 let testsUnlocked = true; // Default to unlocked
+let lastLockStateUpdate = Date.now(); // Track when lock state was last updated
+let lockStatePollingInterval = null; // Store the polling interval ID
+let isPollingActive = false; // Flag to track if polling is active
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
@@ -1302,6 +1305,7 @@ const tests = {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     loadTestLockSettings(); // Initialize test lock settings
+    initializeLockStateSync(); // Initialize real-time sync system
     showSplashScreen();
 });
 
@@ -1379,68 +1383,74 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
-    // Check if tests are locked before proceeding
-    if (!testsUnlocked) {
-        showTestsLockedModal();
-        return;
-    }
+    // Always check for the latest lock state before starting
+    checkForLockStateUpdates();
     
-    // Show loading screen first
-    showTestLoadingScreen(() => {
-        // This callback runs after loading is complete
-        currentTest = testNumber;
-        currentQuestion = 0;
-        currentAnswers = [];
-        shuffledQuestions = [];
-        originalCorrectAnswers = [];
-        
-        const test = tests[testNumber];
-        if (!test) {
-            alert('This test is not yet available.');
+    // Small delay to allow state update to complete
+    setTimeout(() => {
+        // Check if tests are locked before proceeding
+        if (!testsUnlocked) {
+            showTestsLockedModal();
             return;
         }
         
-        // Create a shuffled copy of questions
-        shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
-            // For each question, shuffle the answers and update correct answer indices
-            const shuffledAnswers = [...q.answers];
-            const answerMapping = shuffledAnswers.map((_, i) => i);
+        // Show loading screen first
+        showTestLoadingScreen(() => {
+            // This callback runs after loading is complete
+            currentTest = testNumber;
+            currentQuestion = 0;
+            currentAnswers = [];
+            shuffledQuestions = [];
+            originalCorrectAnswers = [];
             
-            // Shuffle answer mapping
-            for (let i = answerMapping.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+            const test = tests[testNumber];
+            if (!test) {
+                alert('This test is not yet available.');
+                return;
             }
             
-            // Apply shuffling to answers
-            const newAnswers = answerMapping.map(i => q.answers[i]);
+            // Create a shuffled copy of questions
+            shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
+                // For each question, shuffle the answers and update correct answer indices
+                const shuffledAnswers = [...q.answers];
+                const answerMapping = shuffledAnswers.map((_, i) => i);
+                
+                // Shuffle answer mapping
+                for (let i = answerMapping.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
+                }
+                
+                // Apply shuffling to answers
+                const newAnswers = answerMapping.map(i => q.answers[i]);
+                
+                // Update correct answer indices based on new positions
+                let newCorrect;
+                if (q.multiple) {
+                    newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
+                } else {
+                    newCorrect = answerMapping.indexOf(q.correct);
+                }
+                
+                return {
+                    ...q,
+                    answers: newAnswers,
+                    correct: newCorrect,
+                    originalIndex: index
+                };
+            }));
             
-            // Update correct answer indices based on new positions
-            let newCorrect;
-            if (q.multiple) {
-                newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
-            } else {
-                newCorrect = answerMapping.indexOf(q.correct);
-            }
+            // Shuffle the questions themselves
+            shuffledQuestions = shuffleArray(shuffledQuestions);
             
-            return {
-                ...q,
-                answers: newAnswers,
-                correct: newCorrect,
-                originalIndex: index
-            };
-        }));
-        
-        // Shuffle the questions themselves
-        shuffledQuestions = shuffleArray(shuffledQuestions);
-        
-        // Store the original correct answers for scoring
-        originalCorrectAnswers = new Array(shuffledQuestions.length);
-        
-        document.getElementById('quiz-title').textContent = test.title;
-        showSection('quiz');
-        displayQuestion();
-    });
+            // Store the original correct answers for scoring
+            originalCorrectAnswers = new Array(shuffledQuestions.length);
+            
+            document.getElementById('quiz-title').textContent = test.title;
+            showSection('quiz');
+            displayQuestion();
+        });
+    }, 100);
 }
 
 function displayQuestion() {
@@ -2233,6 +2243,7 @@ function showAdminTab(tabName) {
     } else if (tabName === 'settings') {
         loadTestLockSettings();
         generateLockStateURLs(); // Generate URLs when settings tab is opened
+        setTimeout(addSyncStatusIndicator, 100); // Add sync status indicator
     }
 }
 
@@ -2447,31 +2458,11 @@ function generateCertificateOnCanvas(ctx, canvas) {
 
 // Test lock functionality with enhanced cross-device coordination
 function loadTestLockSettings() {
-    // First, try to load from URL parameters (for cross-device coordination)
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLockState = urlParams.get('testsLocked');
-    
-    if (urlLockState !== null) {
-        testsUnlocked = urlLockState !== 'true';
-        // Save this state to localStorage for persistence
-        saveTestLockSettings();
-    } else {
-        // Fall back to localStorage
-        const savedSettings = localStorage.getItem('testLockSettings');
-        if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
-            testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
-        }
-    }
-    
-    updateTestLockUI();
+    enhancedLoadTestLockSettings();
 }
 
 function saveTestLockSettings() {
-    const settings = {
-        testsUnlocked: testsUnlocked
-    };
-    localStorage.setItem('testLockSettings', JSON.stringify(settings));
+    saveTestLockSettingsWithTimestamp();
 }
 
 function toggleTestAccess() {
@@ -2602,3 +2593,202 @@ function showTestLoadingScreen(callback) {
     
     updateLoading();
 }
+
+// Real-time Cross-Device Lock State Synchronization System
+function initializeLockStateSync() {
+    // Start polling when on test selection or admin pages
+    startLockStatePolling();
+    
+    // Listen for page visibility changes to resume polling when page becomes visible
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            checkForLockStateUpdates();
+        }
+    });
+    
+    // Listen for storage events from other tabs/windows
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'testLockSettings' || e.key === 'lockStateTimestamp') {
+            checkForLockStateUpdates();
+        }
+    });
+}
+
+function startLockStatePolling() {
+    if (isPollingActive) return;
+    
+    isPollingActive = true;
+    // Poll every 3 seconds for state changes
+    lockStatePollingInterval = setInterval(checkForLockStateUpdates, 3000);
+}
+
+function stopLockStatePolling() {
+    if (lockStatePollingInterval) {
+        clearInterval(lockStatePollingInterval);
+        lockStatePollingInterval = null;
+        isPollingActive = false;
+    }
+}
+
+function checkForLockStateUpdates() {
+    // Get the stored timestamp of the last lock state update
+    const storedTimestamp = localStorage.getItem('lockStateTimestamp');
+    const currentTimestamp = storedTimestamp ? parseInt(storedTimestamp) : 0;
+    
+    // If we have a newer timestamp than our local one, update the state
+    if (currentTimestamp > lastLockStateUpdate) {
+        console.log('Lock state update detected from another device/tab');
+        loadTestLockSettings();
+        lastLockStateUpdate = currentTimestamp;
+        showSyncNotification('Test access status synchronized');
+    }
+    
+    // Also check URL parameters for immediate updates
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLockState = urlParams.get('testsLocked');
+    
+    if (urlLockState !== null) {
+        const newState = urlLockState !== 'true';
+        if (newState !== testsUnlocked) {
+            console.log('Lock state update detected from URL parameter');
+            testsUnlocked = newState;
+            updateTestLockUI();
+            saveTestLockSettingsWithTimestamp();
+            showSyncNotification('Test access status updated');
+            
+            // Clean the URL to prevent repeated processing
+            const cleanUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    }
+}
+
+function saveTestLockSettingsWithTimestamp() {
+    const timestamp = Date.now();
+    lastLockStateUpdate = timestamp;
+    
+    const settings = {
+        testsUnlocked: testsUnlocked,
+        timestamp: timestamp
+    };
+    
+    localStorage.setItem('testLockSettings', JSON.stringify(settings));
+    localStorage.setItem('lockStateTimestamp', timestamp.toString());
+}
+
+function showSyncNotification(message) {
+    // Create or update sync notification
+    let notification = document.getElementById('sync-notification');
+    
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'sync-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease-in-out;
+            max-width: 300px;
+        `;
+        document.body.appendChild(notification);
+    }
+    
+    notification.textContent = message;
+    
+    // Show notification
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+    }, 3000);
+}
+
+function addSyncStatusIndicator() {
+    // Add sync status indicator to admin panel
+    const testStatusContainer = document.querySelector('.setting-item');
+    if (testStatusContainer && !document.getElementById('sync-status-indicator')) {
+        const syncIndicator = document.createElement('div');
+        syncIndicator.id = 'sync-status-indicator';
+        syncIndicator.innerHTML = `
+            <div style="margin-top: 15px; padding: 10px; background: #f0f8ff; border: 1px solid #4CAF50; border-radius: 5px;">
+                <h5 style="margin: 0 0 5px 0; color: #333;">🔄 Real-Time Sync Status</h5>
+                <p style="margin: 0; font-size: 12px; color: #666;">
+                    Automatically checking for test lock changes every 3 seconds across all devices.
+                </p>
+                <div id="last-sync-time" style="font-size: 11px; color: #888; margin-top: 5px;">
+                    Last check: <span id="sync-timestamp">Just now</span>
+                </div>
+            </div>
+        `;
+        testStatusContainer.appendChild(syncIndicator);
+        
+        // Update sync timestamp periodically
+        setInterval(updateSyncTimestamp, 3000);
+    }
+}
+
+function updateSyncTimestamp() {
+    const timestampElement = document.getElementById('sync-timestamp');
+    if (timestampElement) {
+        const now = new Date();
+        timestampElement.textContent = now.toLocaleTimeString();
+    }
+}
+
+// Enhanced version of existing functions to include timestamp tracking
+function toggleTestAccess() {
+    const toggle = document.getElementById('tests-unlocked-toggle');
+    testsUnlocked = toggle.checked;
+    updateTestLockUI();
+    saveTestLockSettingsWithTimestamp(); // Use the new version with timestamp
+    
+    // Generate URLs for easy cross-device coordination
+    generateLockStateURLs();
+    
+    // Show immediate feedback
+    showSyncNotification(testsUnlocked ? 'Tests unlocked on all devices' : 'Tests locked on all devices');
+}
+
+function enhancedLoadTestLockSettings() {
+    // First, try to load from URL parameters (for cross-device coordination)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLockState = urlParams.get('testsLocked');
+    
+    if (urlLockState !== null) {
+        testsUnlocked = urlLockState !== 'true';
+        // Save this state with timestamp for cross-device sync
+        saveTestLockSettingsWithTimestamp();
+        showSyncNotification('Test access synchronized from shared link');
+    } else {
+        // Fall back to localStorage
+        const savedSettings = localStorage.getItem('testLockSettings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
+            
+            // Load timestamp if available
+            if (settings.timestamp) {
+                lastLockStateUpdate = settings.timestamp;
+            }
+        }
+    }
+    
+    updateTestLockUI();
+}
+
