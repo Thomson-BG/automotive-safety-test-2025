@@ -32,9 +32,9 @@ function generateAccessCode() {
     // Get current time in milliseconds
     const now = new Date().getTime();
     
-    // Calculate 3-hour window (3 hours = 3 * 60 * 60 * 1000 = 10,800,000 ms)
-    const threeHours = 3 * 60 * 60 * 1000;
-    const window = Math.floor(now / threeHours);
+    // Calculate 1-hour window (1 hour = 1 * 60 * 60 * 1000 = 3,600,000 ms)
+    const oneHour = 1 * 60 * 60 * 1000;
+    const window = Math.floor(now / oneHour);
     
     // Generate deterministic 5-digit code based on time window
     // Using a simple but effective algorithm for consistent code generation
@@ -47,7 +47,7 @@ function generateAccessCode() {
     return {
         code: code.toString(),
         window: window,
-        expiresAt: (window + 1) * threeHours
+        expiresAt: (window + 1) * oneHour
     };
 }
 
