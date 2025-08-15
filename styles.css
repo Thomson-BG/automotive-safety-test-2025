@@ -908,4 +908,70 @@ input:checked + .toggle-slider:before {
 .status-text.locked {
     color: #f44336;
 }
+
+/* URL Container Styles */
+.url-container {
+    margin-top: 20px;
+}
+
+.url-section {
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.url-section h5 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.url-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.url-input {
+    flex: 1;
+    padding: 8px 12px;
+    background-color: #444;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.url-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.btn-copy {
+    padding: 8px 16px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-copy:hover {
+    background-color: #1976D2;
+}
+
+.url-instructions {
+    font-size: 12px;
+    color: #aaa;
+    font-style: italic;
+    margin-top: 10px;
+    line-height: 1.4;
+}
 }

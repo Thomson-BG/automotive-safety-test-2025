@@ -1828,13 +1828,8 @@ function viewCertificate() {
     showSection('certificate');
     showWarningModal();
     
-    // Check if this is the first time viewing the certificate
-    const hasViewedCertificate = localStorage.getItem('hasViewedCertificate');
-    if (!hasViewedCertificate) {
-        // Mark as viewed and trigger confetti
-        localStorage.setItem('hasViewedCertificate', 'true');
-        triggerConfetti();
-    }
+    // Trigger confetti every time the certificate is viewed
+    triggerConfetti();
 }
 
 // Add event listener for certificate button
@@ -1959,27 +1954,31 @@ function addWatermarks(ctx, width, height) {
     ctx.save();
     ctx.globalAlpha = 0.25; // More visible watermark
     ctx.fillStyle = '#cccccc';
-    ctx.font = 'bold 48px serif'; // Much bigger font
+    ctx.font = 'bold 36px serif'; // Smaller font to fit spacing requirements
     ctx.textAlign = 'center';
     
-    // Strategic watermarks overlaying critical student information areas
+    // Strategic watermarks all at 45-degree angle, evenly spaced, non-overlapping
     const watermarkText = 'BULLDOG GARAGE SAFETY';
+    const rotation = Math.PI / 4; // 45 degrees for all watermarks
+    
+    // Calculate spacing to ensure no overlap and even distribution
+    // Using 6 watermarks total arranged in a 2x3 grid pattern
     const positions = [
-        // Over student name area (y=250)
-        {x: width * 0.5, y: 250, rotation: -Math.PI / 8},
-        // Over email area (y=420) 
-        {x: width * 0.5, y: 420, rotation: Math.PI / 8},
-        // Additional coverage over student ID area
-        {x: width * 0.3, y: 280, rotation: -Math.PI / 6},
-        {x: width * 0.7, y: 280, rotation: Math.PI / 6},
-        // Background coverage
-        {x: width * 0.5, y: height * 0.6, rotation: 0}
+        // Top row
+        {x: width * 0.25, y: height * 0.25},
+        {x: width * 0.75, y: height * 0.25},
+        // Middle row  
+        {x: width * 0.25, y: height * 0.5},
+        {x: width * 0.75, y: height * 0.5},
+        // Bottom row
+        {x: width * 0.25, y: height * 0.75},
+        {x: width * 0.75, y: height * 0.75}
     ];
     
     positions.forEach(pos => {
         ctx.save();
         ctx.translate(pos.x, pos.y);
-        ctx.rotate(pos.rotation);
+        ctx.rotate(rotation); // All watermarks at same 45-degree angle
         ctx.fillText(watermarkText, 0, 0);
         ctx.restore();
     });
@@ -2233,6 +2232,7 @@ function showAdminTab(tabName) {
         loadTestQuestions();
     } else if (tabName === 'settings') {
         loadTestLockSettings();
+        generateLockStateURLs(); // Generate URLs when settings tab is opened
     }
 }
 
@@ -2445,13 +2445,25 @@ function generateCertificateOnCanvas(ctx, canvas) {
     ctx.fillText('Mr. Thomson - Instructor, Bulldog Garage', 60, canvas.height - 50);
 }
 
-// Test lock functionality
+// Test lock functionality with enhanced cross-device coordination
 function loadTestLockSettings() {
-    const savedSettings = localStorage.getItem('testLockSettings');
-    if (savedSettings) {
-        const settings = JSON.parse(savedSettings);
-        testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
+    // First, try to load from URL parameters (for cross-device coordination)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLockState = urlParams.get('testsLocked');
+    
+    if (urlLockState !== null) {
+        testsUnlocked = urlLockState !== 'true';
+        // Save this state to localStorage for persistence
+        saveTestLockSettings();
+    } else {
+        // Fall back to localStorage
+        const savedSettings = localStorage.getItem('testLockSettings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
+        }
     }
+    
     updateTestLockUI();
 }
 
@@ -2467,6 +2479,9 @@ function toggleTestAccess() {
     testsUnlocked = toggle.checked;
     updateTestLockUI();
     saveTestLockSettings();
+    
+    // Generate URLs for easy cross-device coordination
+    generateLockStateURLs();
 }
 
 function updateTestLockUI() {
@@ -2485,6 +2500,54 @@ function updateTestLockUI() {
 
 function showTestsLockedModal() {
     document.getElementById('tests-locked-modal').style.display = 'block';
+}
+
+function generateLockStateURLs() {
+    const baseURL = window.location.href.split('?')[0];
+    const lockedURL = `${baseURL}?testsLocked=true`;
+    const unlockedURL = `${baseURL}?testsLocked=false`;
+    
+    // Update the admin interface with URLs for cross-device coordination
+    const urlContainer = document.getElementById('lock-urls-container');
+    if (urlContainer) {
+        urlContainer.innerHTML = `
+            <div class="url-section">
+                <h5>Cross-Device Coordination URLs:</h5>
+                <p><strong>To lock tests on all devices:</strong></p>
+                <div class="url-box">
+                    <input type="text" readonly value="${lockedURL}" id="locked-url" class="url-input">
+                    <button onclick="copyToClipboard('locked-url')" class="btn-copy">Copy</button>
+                </div>
+                <p><strong>To unlock tests on all devices:</strong></p>
+                <div class="url-box">
+                    <input type="text" readonly value="${unlockedURL}" id="unlocked-url" class="url-input">
+                    <button onclick="copyToClipboard('unlocked-url')" class="btn-copy">Copy</button>
+                </div>
+                <p class="url-instructions">Share the appropriate URL with other devices to sync the lock state across all devices.</p>
+            </div>
+        `;
+    }
+}
+
+function copyToClipboard(inputId) {
+    const input = document.getElementById(inputId);
+    input.select();
+    input.setSelectionRange(0, 99999); // For mobile devices
+    navigator.clipboard.writeText(input.value).then(() => {
+        // Show feedback
+        const button = input.nextElementSibling;
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.backgroundColor = '#4CAF50';
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.backgroundColor = '';
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        document.execCommand('copy');
+        alert('URL copied to clipboard!');
+    });
 }
 
 function closeTestsLockedModal() {
