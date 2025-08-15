@@ -1383,19 +1383,33 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
-    // Always check for the latest lock state before starting
-    checkForLockStateUpdates();
+    // Force an immediate and thorough lock state check
+    const currentLockState = forceCheckLockState();
     
-    // Small delay to allow state update to complete
+    // Immediately check lock state and show modal if locked
+    if (!currentLockState) {
+        showTestsLockedModal();
+        return;
+    }
+    
+    // Small delay to allow any pending state updates to complete
     setTimeout(() => {
-        // Check if tests are locked before proceeding
-        if (!testsUnlocked) {
+        // Double-check the lock state after a brief delay
+        const doubleCheckState = forceCheckLockState();
+        if (!doubleCheckState) {
             showTestsLockedModal();
             return;
         }
         
         // Show loading screen first
         showTestLoadingScreen(() => {
+            // Final check before actually starting the test
+            const finalCheckState = forceCheckLockState();
+            if (!finalCheckState) {
+                showTestsLockedModal();
+                return;
+            }
+            
             // This callback runs after loading is complete
             currentTest = testNumber;
             currentQuestion = 0;
@@ -1450,7 +1464,7 @@ function startTest(testNumber) {
             showSection('quiz');
             displayQuestion();
         });
-    }, 100);
+    }, 200);
 }
 
 function displayQuestion() {
@@ -2638,9 +2652,18 @@ function checkForLockStateUpdates() {
     // If we have a newer timestamp than our local one, update the state
     if (currentTimestamp > lastLockStateUpdate) {
         console.log('Lock state update detected from another device/tab');
-        loadTestLockSettings();
-        lastLockStateUpdate = currentTimestamp;
-        showSyncNotification('Test access status synchronized');
+        const savedSettings = localStorage.getItem('testLockSettings');
+        if (savedSettings) {
+            try {
+                const settings = JSON.parse(savedSettings);
+                testsUnlocked = settings.testsUnlocked !== false;
+                updateTestLockUI();
+                lastLockStateUpdate = currentTimestamp;
+                showSyncNotification('Test access status synchronized');
+            } catch (e) {
+                console.log('Error parsing settings during sync check');
+            }
+        }
     }
     
     // Also check URL parameters for immediate updates
@@ -2661,6 +2684,34 @@ function checkForLockStateUpdates() {
             window.history.replaceState({}, document.title, cleanUrl);
         }
     }
+}
+
+// Add immediate lock state check function for critical moments
+function forceCheckLockState() {
+    checkForLockStateUpdates();
+    
+    // Also check if there's a more recent timestamp from another source
+    const allTimestamps = [
+        parseInt(localStorage.getItem('lockStateTimestamp') || '0'),
+        lastLockStateUpdate
+    ];
+    
+    const latestTimestamp = Math.max(...allTimestamps);
+    if (latestTimestamp > lastLockStateUpdate) {
+        const savedSettings = localStorage.getItem('testLockSettings');
+        if (savedSettings) {
+            try {
+                const settings = JSON.parse(savedSettings);
+                testsUnlocked = settings.testsUnlocked !== false;
+                updateTestLockUI();
+                lastLockStateUpdate = latestTimestamp;
+            } catch (e) {
+                console.log('Error in force check');
+            }
+        }
+    }
+    
+    return testsUnlocked;
 }
 
 function saveTestLockSettingsWithTimestamp() {
@@ -2775,20 +2826,32 @@ function enhancedLoadTestLockSettings() {
         // Save this state with timestamp for cross-device sync
         saveTestLockSettingsWithTimestamp();
         showSyncNotification('Test access synchronized from shared link');
+        
+        // Clean the URL to prevent repeated processing
+        const cleanUrl = window.location.href.split('?')[0];
+        window.history.replaceState({}, document.title, cleanUrl);
     } else {
         // Fall back to localStorage
         const savedSettings = localStorage.getItem('testLockSettings');
         if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
-            testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
-            
-            // Load timestamp if available
-            if (settings.timestamp) {
-                lastLockStateUpdate = settings.timestamp;
+            try {
+                const settings = JSON.parse(savedSettings);
+                testsUnlocked = settings.testsUnlocked !== false; // Default to true if not set
+                
+                // Load timestamp if available
+                if (settings.timestamp) {
+                    lastLockStateUpdate = settings.timestamp;
+                }
+            } catch (e) {
+                console.log('Error parsing saved settings, using defaults');
+                testsUnlocked = true; // Default to unlocked on error
             }
         }
     }
     
     updateTestLockUI();
+    
+    // Force an immediate state check after loading
+    setTimeout(checkForLockStateUpdates, 500);
 }
 
