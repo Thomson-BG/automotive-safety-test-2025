@@ -6,10 +6,16 @@ let testData = {};
 let currentAnswers = [];
 let shuffledQuestions = [];
 let originalCorrectAnswers = [];
-let testsUnlocked = true; // Default to unlocked
+let testsUnlocked = false; // Default to locked - requires access code
 let lastLockStateUpdate = Date.now(); // Track when lock state was last updated
 let lockStatePollingInterval = null; // Store the polling interval ID
 let isPollingActive = false; // Flag to track if polling is active
+
+// Access code system variables
+let currentAccessCode = '';
+let accessCodeWindow = 0;
+let studentAccessData = null; // Stores student's access code validation data
+let accessCodeCheckInterval = null; // For periodic validation during tests
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
@@ -19,6 +25,181 @@ function shuffleArray(array) {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+}
+
+// Time-based Access Code System
+function generateAccessCode() {
+    // Get current time in milliseconds
+    const now = new Date().getTime();
+    
+    // Calculate 1-hour window (1 hour = 1 * 60 * 60 * 1000 = 3,600,000 ms)
+    const oneHour = 1 * 60 * 60 * 1000;
+    const window = Math.floor(now / oneHour);
+    
+    // Generate deterministic 5-digit code based on time window
+    // Using a simple but effective algorithm for consistent code generation
+    let seed = window * 31; // Use prime number for better distribution
+    seed = (seed * 1664525 + 1013904223) % Math.pow(2, 32); // Linear congruential generator
+    
+    // Extract 5-digit code (10000-99999)
+    const code = 10000 + (seed % 90000);
+    
+    return {
+        code: code.toString(),
+        window: window,
+        expiresAt: (window + 1) * oneHour
+    };
+}
+
+function getCurrentAccessCode() {
+    const codeData = generateAccessCode();
+    currentAccessCode = codeData.code;
+    accessCodeWindow = codeData.window;
+    return codeData;
+}
+
+function getTimeUntilNextCode() {
+    const codeData = generateAccessCode();
+    const now = new Date().getTime();
+    const timeLeft = codeData.expiresAt - now;
+    
+    if (timeLeft <= 0) {
+        return { hours: 0, minutes: 0, seconds: 0 };
+    }
+    
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+    return { hours, minutes, seconds };
+}
+
+function validateAccessCode(inputCode) {
+    const codeData = generateAccessCode();
+    return inputCode === codeData.code;
+}
+
+function isAccessCodeValid() {
+    if (!studentAccessData) return false;
+    
+    const currentCodeData = generateAccessCode();
+    
+    // Check if student's code matches current window
+    return studentAccessData.window === currentCodeData.window && 
+           studentAccessData.code === currentCodeData.code;
+}
+
+// Access Code Modal Functions
+function showAccessCodeModal() {
+    document.getElementById('access-code-modal').style.display = 'block';
+    document.getElementById('access-code-input').focus();
+    // Clear any previous error
+    document.getElementById('access-code-error').style.display = 'none';
+    document.getElementById('access-code-input').value = '';
+}
+
+function closeAccessCodeModal() {
+    document.getElementById('access-code-modal').style.display = 'none';
+}
+
+function submitAccessCode() {
+    const inputCode = document.getElementById('access-code-input').value.trim();
+    const errorDiv = document.getElementById('access-code-error');
+    
+    if (inputCode.length !== 5) {
+        errorDiv.textContent = 'Please enter a 5-digit access code.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    if (validateAccessCode(inputCode)) {
+        // Valid code - store student access data
+        const codeData = generateAccessCode();
+        studentAccessData = {
+            code: codeData.code,
+            window: codeData.window,
+            timestamp: Date.now()
+        };
+        
+        closeAccessCodeModal();
+        // Continue with original action (will be handled by calling function)
+        testsUnlocked = true; // Temporarily unlock for this session
+    } else {
+        errorDiv.textContent = 'Invalid access code. Please check with your instructor for the current code.';
+        errorDiv.style.display = 'block';
+        document.getElementById('access-code-input').value = '';
+        document.getElementById('access-code-input').focus();
+    }
+}
+
+// Periodic Access Code Validation
+function startAccessCodeValidation() {
+    // Check every 30 seconds during test
+    accessCodeCheckInterval = setInterval(() => {
+        if (!isAccessCodeValid()) {
+            // Code has expired - lock out student
+            stopAccessCodeValidation();
+            alert('Your access code has expired. You will be returned to the main menu.');
+            showSection('test-selection');
+            testsUnlocked = false;
+        }
+    }, 30000); // Check every 30 seconds
+}
+
+function stopAccessCodeValidation() {
+    if (accessCodeCheckInterval) {
+        clearInterval(accessCodeCheckInterval);
+        accessCodeCheckInterval = null;
+    }
+}
+
+// Admin Functions for Access Code Display
+function updateAccessCodeDisplay() {
+    const codeData = getCurrentAccessCode();
+    const timeLeft = getTimeUntilNextCode();
+    
+    // Update current code display
+    const codeDisplay = document.getElementById('current-access-code');
+    if (codeDisplay) {
+        codeDisplay.textContent = codeData.code;
+    }
+    
+    // Update timer display
+    const timerDisplay = document.getElementById('access-code-timer');
+    if (timerDisplay) {
+        const hours = timeLeft.hours.toString().padStart(2, '0');
+        const minutes = timeLeft.minutes.toString().padStart(2, '0');
+        const seconds = timeLeft.seconds.toString().padStart(2, '0');
+        timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+}
+
+function copyAccessCode() {
+    const codeData = getCurrentAccessCode();
+    navigator.clipboard.writeText(codeData.code).then(() => {
+        // Show brief feedback
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = codeData.code;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 2000);
+    });
 }
 
 // Test questions and answers
@@ -1304,9 +1485,22 @@ const tests = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    loadTestLockSettings(); // Initialize test lock settings
-    initializeLockStateSync(); // Initialize real-time sync system
     showSplashScreen();
+    
+    // Set up access code input event listener
+    const accessCodeInput = document.getElementById('access-code-input');
+    if (accessCodeInput) {
+        accessCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAccessCode();
+            }
+        });
+        
+        // Only allow numbers
+        accessCodeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    }
 });
 
 function showSplashScreen() {
@@ -1383,88 +1577,71 @@ function showSection(sectionId) {
 }
 
 function startTest(testNumber) {
-    // Force an immediate and thorough lock state check
-    const currentLockState = forceCheckLockState();
-    
-    // Immediately check lock state and show modal if locked
-    if (!currentLockState) {
-        showTestsLockedModal();
+    // Check if student has valid access code
+    if (!isAccessCodeValid()) {
+        showAccessCodeModal();
         return;
     }
     
-    // Small delay to allow any pending state updates to complete
-    setTimeout(() => {
-        // Double-check the lock state after a brief delay
-        const doubleCheckState = forceCheckLockState();
-        if (!doubleCheckState) {
-            showTestsLockedModal();
+    // Show loading screen first
+    showTestLoadingScreen(() => {
+        // This callback runs after loading is complete
+        currentTest = testNumber;
+        currentQuestion = 0;
+        currentAnswers = [];
+        shuffledQuestions = [];
+        originalCorrectAnswers = [];
+        
+        const test = tests[testNumber];
+        if (!test) {
+            alert('This test is not yet available.');
             return;
         }
         
-        // Show loading screen first
-        showTestLoadingScreen(() => {
-            // Final check before actually starting the test
-            const finalCheckState = forceCheckLockState();
-            if (!finalCheckState) {
-                showTestsLockedModal();
-                return;
+        // Create a shuffled copy of questions
+        shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
+            // For each question, shuffle the answers and update correct answer indices
+            const shuffledAnswers = [...q.answers];
+            const answerMapping = shuffledAnswers.map((_, i) => i);
+            
+            // Shuffle answer mapping
+            for (let i = answerMapping.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
             }
             
-            // This callback runs after loading is complete
-            currentTest = testNumber;
-            currentQuestion = 0;
-            currentAnswers = [];
-            shuffledQuestions = [];
-            originalCorrectAnswers = [];
+            // Apply shuffling to answers
+            const newAnswers = answerMapping.map(i => q.answers[i]);
             
-            const test = tests[testNumber];
-            if (!test) {
-                alert('This test is not yet available.');
-                return;
+            // Update correct answer indices based on new positions
+            let newCorrect;
+            if (q.multiple) {
+                newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
+            } else {
+                newCorrect = answerMapping.indexOf(q.correct);
             }
             
-            // Create a shuffled copy of questions
-            shuffledQuestions = shuffleArray(test.questions.map((q, index) => {
-                // For each question, shuffle the answers and update correct answer indices
-                const shuffledAnswers = [...q.answers];
-                const answerMapping = shuffledAnswers.map((_, i) => i);
-                
-                // Shuffle answer mapping
-                for (let i = answerMapping.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [answerMapping[i], answerMapping[j]] = [answerMapping[j], answerMapping[i]];
-                }
-                
-                // Apply shuffling to answers
-                const newAnswers = answerMapping.map(i => q.answers[i]);
-                
-                // Update correct answer indices based on new positions
-                let newCorrect;
-                if (q.multiple) {
-                    newCorrect = q.correct.map(oldIndex => answerMapping.indexOf(oldIndex));
-                } else {
-                    newCorrect = answerMapping.indexOf(q.correct);
-                }
-                
-                return {
-                    ...q,
-                    answers: newAnswers,
-                    correct: newCorrect,
-                    originalIndex: index
-                };
-            }));
-            
-            // Shuffle the questions themselves
-            shuffledQuestions = shuffleArray(shuffledQuestions);
-            
-            // Store the original correct answers for scoring
-            originalCorrectAnswers = new Array(shuffledQuestions.length);
-            
-            document.getElementById('quiz-title').textContent = test.title;
-            showSection('quiz');
-            displayQuestion();
-        });
-    }, 200);
+            return {
+                ...q,
+                answers: newAnswers,
+                correct: newCorrect,
+                originalIndex: index
+            };
+        }));
+        
+        // Shuffle the questions themselves
+        shuffledQuestions = shuffleArray(shuffledQuestions);
+        
+        // Store the original correct answers for scoring
+        originalCorrectAnswers = new Array(shuffledQuestions.length);
+        
+        document.getElementById('quiz-title').textContent = test.title;
+        showSection('quiz');
+        displayQuestion();
+        
+        // Start periodic access code validation during test
+        startAccessCodeValidation();
+    });
 }
 
 function displayQuestion() {
@@ -1632,14 +1809,14 @@ function closeCompletionModal(percentage) {
 }
 
 function retakeQuiz() {
-    // Check if tests are locked before allowing retake
-    if (!testsUnlocked) {
+    // Check if student has valid access code before allowing retake
+    if (!isAccessCodeValid()) {
         // Close the completion modal first
         const modal = document.getElementById('completion-modal');
         if (modal) {
             modal.remove();
         }
-        showTestsLockedModal();
+        showAccessCodeModal();
         return;
     }
     
@@ -2223,7 +2400,12 @@ function submitAdminLogin() {
         closeAdminLoginModal();
         showSection('admin-dashboard');
         loadTestQuestions();
-        loadTestLockSettings(); // Load test lock settings when admin logs in
+        
+        // Initialize access code display
+        updateAccessCodeDisplay();
+        
+        // Set up timer to update display every second
+        setInterval(updateAccessCodeDisplay, 1000);
     } else {
         alert('Invalid credentials. Please try again.');
         document.getElementById('admin-password').value = '';

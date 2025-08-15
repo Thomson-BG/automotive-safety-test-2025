@@ -198,6 +198,27 @@
             </div>
         </div>
 
+        <!-- Access Code Entry Modal -->
+        <div id="access-code-modal" class="modal">
+            <div class="modal-content">
+                <h3>Enter Class Access Code</h3>
+                <p>Tests are locked. Please enter the current access code provided by your instructor to continue.</p>
+                <div class="form-group">
+                    <label for="access-code-input">5-Digit Access Code:</label>
+                    <input type="text" id="access-code-input" maxlength="5" pattern="[0-9]{5}" 
+                           placeholder="12345" autocomplete="off" 
+                           style="text-align: center; font-size: 1.2em; letter-spacing: 0.2em;">
+                </div>
+                <div id="access-code-error" class="error-message" style="display: none; color: #ff4444; margin: 10px 0;">
+                    Invalid access code. Please check with your instructor for the current code.
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn-primary" onclick="submitAccessCode()">Submit</button>
+                    <button class="btn-secondary" onclick="closeAccessCodeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin Dashboard Section -->
         <section id="admin-dashboard" class="section">
             <div class="admin-container">
@@ -242,20 +263,37 @@
                 </div>
 
                 <div id="admin-settings" class="admin-tab-content">
-                    <h3>Test Access Settings</h3>
+                    <h3>Test Access Control</h3>
                     <div class="settings-container">
                         <div class="setting-item">
-                            <h4>Test Access Control</h4>
-                            <p>Control whether students can access tests. When locked, students will see a message that tests are only accessible while in class.</p>
-                            <div class="toggle-container">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="tests-unlocked-toggle" onchange="toggleTestAccess()" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span id="test-status-text" class="status-text">Tests are UNLOCKED</span>
+                            <h4>Time-Based Access Code System</h4>
+                            <p>Tests are secured with a rotating 5-digit access code that changes every 1 hour. Students must enter the current code to access tests.</p>
+                            
+                            <div class="access-code-display">
+                                <div class="current-code">
+                                    <h5>Current Access Code:</h5>
+                                    <div class="code-display" id="current-access-code">
+                                        Loading...
+                                    </div>
+                                    <button class="btn-copy" onclick="copyAccessCode()">Copy Code</button>
+                                </div>
+                                
+                                <div class="code-timer">
+                                    <h5>Time Until Next Code:</h5>
+                                    <div class="timer-display" id="access-code-timer">
+                                        Loading...
+                                    </div>
+                                </div>
                             </div>
-                            <div id="lock-urls-container" class="url-container">
-                                <!-- URLs will be generated here -->
+                            
+                            <div class="code-info">
+                                <h5>How It Works:</h5>
+                                <ul>
+                                    <li>A new 5-digit code is generated every 1 hour automatically</li>
+                                    <li>Students must enter the current code to access tests</li>
+                                    <li>Access is automatically revoked when the code expires</li>
+                                    <li>No URLs need to be shared - the system enforces access across all devices</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
