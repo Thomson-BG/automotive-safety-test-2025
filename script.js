@@ -16,6 +16,8 @@ let currentAccessCode = '';
 let accessCodeWindow = 0;
 let studentAccessData = null; // Stores student's access code validation data
 let accessCodeCheckInterval = null; // For periodic validation during tests
+let manuallyRefreshedCode = null; // Stores manually refreshed code data
+let isManualRefreshActive = false; // Flag to track if manual refresh is active
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
@@ -29,6 +31,19 @@ function shuffleArray(array) {
 
 // Time-based Access Code System
 function generateAccessCode() {
+    // Check if we have an active manually refreshed code
+    if (isManualRefreshActive && manuallyRefreshedCode) {
+        const now = new Date().getTime();
+        // If manual code hasn't expired, return it
+        if (now < manuallyRefreshedCode.expiresAt) {
+            return manuallyRefreshedCode;
+        } else {
+            // Manual code has expired, clear it and fall back to time-based
+            isManualRefreshActive = false;
+            manuallyRefreshedCode = null;
+        }
+    }
+    
     // Get current time in milliseconds
     const now = new Date().getTime();
     
@@ -49,6 +64,29 @@ function generateAccessCode() {
         window: window,
         expiresAt: (window + 1) * oneHour
     };
+}
+
+// Function to generate a manual refresh code
+function generateManualRefreshCode() {
+    const now = new Date().getTime();
+    const oneHour = 1 * 60 * 60 * 1000;
+    
+    // Generate a random code for manual refresh
+    const randomSeed = Math.floor(Math.random() * 90000);
+    const code = 10000 + randomSeed;
+    
+    // Manual codes expire in 1 hour from now
+    const expiresAt = now + oneHour;
+    
+    manuallyRefreshedCode = {
+        code: code.toString(),
+        window: Math.floor(now / oneHour), // Use current window for compatibility
+        expiresAt: expiresAt,
+        isManual: true
+    };
+    
+    isManualRefreshActive = true;
+    return manuallyRefreshedCode;
 }
 
 function getCurrentAccessCode() {
@@ -175,6 +213,9 @@ function updateAccessCodeDisplay() {
 }
 
 function refreshAccessCodeDisplay() {
+    // Generate a new manual refresh code
+    generateManualRefreshCode();
+    
     // Force immediate update of access code display
     updateAccessCodeDisplay();
     
