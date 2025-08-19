@@ -22,6 +22,25 @@ A comprehensive safety test platform for high school automotive classes at **Hem
 - 👨‍💼 **Admin Dashboard** - Secure admin login for content management
 - 📝 **Question Management** - Add, edit, and delete questions through admin interface
 - 💾 **Data Persistence** - Local storage for progress tracking and student data
+- 🔑 **Enhanced Access Code Security** - Real-time validation with 3-second intervals
+
+#### 🔑 **Access Code Security System**
+The platform implements a robust access code security system to ensure only authorized students can access tests:
+
+- **Time-Based Access Codes**: Automatically generated 5-digit codes that change every hour
+- **Manual Refresh Capability**: Instructors can instantly generate new codes when needed
+- **Real-Time Validation**: Access codes are validated every 3 seconds during test sessions
+- **Immediate Lockout**: Students are instantly locked out when access codes change or expire
+- **Cross-Device Security**: Code changes are enforced across all devices and browser sessions
+
+**How it Works:**
+1. Instructors view the current access code in the admin dashboard
+2. Students must enter the valid access code before starting any test
+3. During the test, the system checks every 3 seconds if the access code is still valid
+4. If the instructor refreshes the code or it expires, students are immediately locked out
+5. Students must re-enter the new access code to continue testing
+
+This ensures maximum security and prevents unauthorized access, even if students share codes or leave tests unattended.
 
 ### 🎨 **User Experience**
 - 🌃 **Modern Dark Theme** - Professional automotive-themed design

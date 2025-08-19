@@ -172,16 +172,16 @@ function submitAccessCode() {
 
 // Periodic Access Code Validation
 function startAccessCodeValidation() {
-    // Check every 30 seconds during test
+    // Check every 3 seconds during test
     accessCodeCheckInterval = setInterval(() => {
         if (!isAccessCodeValid()) {
-            // Code has expired - lock out student
+            // Code has changed or expired - lock out student
             stopAccessCodeValidation();
-            alert('Your access code has expired. You will be returned to the main menu.');
+            alert('Your access code has changed or expired. You will be returned to the main menu to enter the new code.');
             showSection('test-selection');
             testsUnlocked = false;
         }
-    }, 30000); // Check every 30 seconds
+    }, 3000); // Check every 3 seconds
 }
 
 function stopAccessCodeValidation() {
