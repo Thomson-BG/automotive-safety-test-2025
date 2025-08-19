@@ -174,6 +174,21 @@ function updateAccessCodeDisplay() {
     }
 }
 
+function refreshAccessCodeDisplay() {
+    // Force immediate update of access code display
+    updateAccessCodeDisplay();
+    
+    // Show brief feedback
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = 'Refreshed!';
+    button.disabled = true;
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+    }, 1500);
+}
+
 function copyAccessCode() {
     const codeData = getCurrentAccessCode();
     navigator.clipboard.writeText(codeData.code).then(() => {
@@ -1732,12 +1747,14 @@ function submitTest() {
     // Save the last answer
     saveCurrentAnswer();
     
-    // Calculate score using shuffled questions
+    // Calculate score using shuffled questions and track incorrect questions
     let correct = 0;
+    let incorrectQuestions = [];
     
     for (let i = 0; i < shuffledQuestions.length; i++) {
         const question = shuffledQuestions[i];
         const userAnswer = currentAnswers[i];
+        let isCorrect = false;
         
         if (question.multiple) {
             // Check if arrays are equal
@@ -1745,11 +1762,21 @@ function submitTest() {
             const userAnswers = (userAnswer || []).sort();
             if (JSON.stringify(correctAnswers) === JSON.stringify(userAnswers)) {
                 correct++;
+                isCorrect = true;
             }
         } else {
             if (userAnswer === question.correct) {
                 correct++;
+                isCorrect = true;
             }
+        }
+        
+        // Track incorrect questions
+        if (!isCorrect) {
+            incorrectQuestions.push({
+                questionNumber: i + 1,
+                questionText: question.question
+            });
         }
     }
     
@@ -1765,16 +1792,34 @@ function submitTest() {
     
     localStorage.setItem('testData', JSON.stringify(testData));
     
-    // Show completion modal first
-    showCompletionModal(percentage);
+    // Show completion modal with incorrect questions
+    showCompletionModal(percentage, incorrectQuestions);
 }
 
-function showCompletionModal(percentage) {
+function showCompletionModal(percentage, incorrectQuestions = []) {
     // Create and show completion modal
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.id = 'completion-modal';
     modal.style.display = 'block';
+    
+    // Create incorrect questions display if there are any
+    let incorrectQuestionsHTML = '';
+    if (incorrectQuestions.length > 0) {
+        incorrectQuestionsHTML = `
+            <div class="incorrect-questions-section">
+                <h4>Questions you got wrong:</h4>
+                <div class="incorrect-questions-list">
+                    ${incorrectQuestions.map(q => 
+                        `<div class="incorrect-question-item">
+                            <strong>Question ${q.questionNumber}:</strong> ${q.questionText}
+                        </div>`
+                    ).join('')}
+                </div>
+                <p class="review-note">Please review these topics before retaking the test.</p>
+            </div>
+        `;
+    }
     
     // Create different button sets based on score
     const buttonHTML = percentage === 100 
@@ -1791,6 +1836,7 @@ function showCompletionModal(percentage) {
             <h3>Test Completed!</h3>
             <p>Your score: ${percentage}%</p>
             <p>${percentage === 100 ? 'Congratulations! You passed!' : 'You need 100% to pass. Please try again.'}</p>
+            ${incorrectQuestionsHTML}
             ${buttonHTML}
         </div>
     `;
