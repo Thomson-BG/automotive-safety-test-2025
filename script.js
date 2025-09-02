@@ -3190,9 +3190,8 @@ function enhancedLoadTestLockSettings() {
         }
     }
     
-    updateTestLockUI();
+        updateTestLockUI();
     
     // Force an immediate state check after loading
     setTimeout(checkForLockStateUpdates, 500);
-}
-
+}}
