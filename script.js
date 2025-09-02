@@ -2553,6 +2553,12 @@ function submitAdminLogin() {
         closeAdminLoginModal();
         showSection('admin-dashboard');
         loadTestQuestions();
+
+    if (username === 'Admin' && password === 'Pass123#') {
+        isAdminLoggedIn = true;
+        closeAdminLoginModal();
+        showSection('admin-dashboard');
+        loadTestQuestions();
         
         // Initialize access code display
         updateAccessCodeDisplay();
