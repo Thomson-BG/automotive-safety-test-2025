@@ -2548,13 +2548,22 @@ function submitAdminLogin() {
     const username = document.getElementById('admin-username').value;
     const password = document.getElementById('admin-password').value;
     
-   if (username === 'Thomson' && password === 'Bulldog!1') {
-    // success logic
-} else if (username === 'Admin' && password === 'Pass123#') {
-    // success logic for second admin
-} else {
-    // error logic
-}
+    if (username === 'Thomson' && password === 'Bulldog!1') {
+        // Success logic for Thomson admin
+        isAdminLoggedIn = true;
+        closeAdminLoginModal();
+        showSection('admin-dashboard');
+        
+        // Initialize access code display
+        updateAccessCodeDisplay();
+        
+        // Set up timer to update display every second
+        setInterval(updateAccessCodeDisplay, 1000);
+    } else if (username === 'Admin' && password === 'Pass123#') {
+        // Success logic for second admin
+        isAdminLoggedIn = true;
+        closeAdminLoginModal();
+        showSection('admin-dashboard');
         
         // Initialize access code display
         updateAccessCodeDisplay();
@@ -2562,6 +2571,7 @@ function submitAdminLogin() {
         // Set up timer to update display every second
         setInterval(updateAccessCodeDisplay, 1000);
     } else {
+        // Error logic
         alert('Invalid credentials. Please try again.');
         document.getElementById('admin-password').value = '';
     }
@@ -3190,4 +3200,4 @@ function enhancedLoadTestLockSettings() {
     
     // Force an immediate state check after loading
     setTimeout(checkForLockStateUpdates, 500);
-}}
+}
