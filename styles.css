@@ -989,6 +989,25 @@ input:checked + .toggle-slider:before {
     cursor: not-allowed;
 }
 
+.btn-menu {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.btn-menu:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
 .code-controls {
     text-align: center;
     margin-top: 20px;
