@@ -27,7 +27,7 @@ A comprehensive safety test platform for high school automotive classes at **Hem
 #### 🔑 **Access Code Security System**
 The platform implements a robust access code security system to ensure only authorized students can access tests:
 
-- **Time-Based Access Codes**: Automatically generated 5-digit codes that change every hour
+- **Time-Based Access Codes**: Automatically generated 5-digit codes that change every 90 minutes
 - **Manual Refresh Capability**: Instructors can instantly generate new codes when needed
 - **Real-Time Validation**: Access codes are validated every 3 seconds during test sessions
 - **Immediate Lockout**: Students are instantly locked out when access codes change or expire

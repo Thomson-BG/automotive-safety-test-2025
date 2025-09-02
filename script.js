@@ -47,9 +47,9 @@ function generateAccessCode() {
     // Get current time in milliseconds
     const now = new Date().getTime();
     
-    // Calculate 1-hour window (1 hour = 1 * 60 * 60 * 1000 = 3,600,000 ms)
-    const oneHour = 1 * 60 * 60 * 1000;
-    const window = Math.floor(now / oneHour);
+    // Calculate 90-minute window (90 minutes = 90 * 60 * 1000 = 5,400,000 ms)
+    const ninetyMinutes = 90 * 60 * 1000;
+    const window = Math.floor(now / ninetyMinutes);
     
     // Generate deterministic 5-digit code based on time window
     // Using a simple but effective algorithm for consistent code generation
@@ -62,25 +62,25 @@ function generateAccessCode() {
     return {
         code: code.toString(),
         window: window,
-        expiresAt: (window + 1) * oneHour
+        expiresAt: (window + 1) * ninetyMinutes
     };
 }
 
 // Function to generate a manual refresh code
 function generateManualRefreshCode() {
     const now = new Date().getTime();
-    const oneHour = 1 * 60 * 60 * 1000;
+    const ninetyMinutes = 90 * 60 * 1000;
     
     // Generate a random code for manual refresh
     const randomSeed = Math.floor(Math.random() * 90000);
     const code = 10000 + randomSeed;
     
-    // Manual codes expire in 1 hour from now
-    const expiresAt = now + oneHour;
+    // Manual codes expire in 90 minutes from now
+    const expiresAt = now + ninetyMinutes;
     
     manuallyRefreshedCode = {
         code: code.toString(),
-        window: Math.floor(now / oneHour), // Use current window for compatibility
+        window: Math.floor(now / ninetyMinutes), // Use current window for compatibility
         expiresAt: expiresAt,
         isManual: true
     };
@@ -1745,6 +1745,30 @@ function displayQuestion() {
         answersContainer.appendChild(answerDiv);
     });
     
+    // Restore previously saved answers
+    if (currentAnswers[currentQuestion]) {
+        const savedAnswer = currentAnswers[currentQuestion];
+        if (question.multiple && Array.isArray(savedAnswer)) {
+            // Multiple choice - restore all selected answers
+            savedAnswer.forEach(answerIndex => {
+                const input = document.getElementById(`answer-${answerIndex}`);
+                const answerDiv = input.closest('.answer-option');
+                if (input && answerDiv) {
+                    input.checked = true;
+                    answerDiv.classList.add('selected');
+                }
+            });
+        } else if (!question.multiple && typeof savedAnswer === 'number') {
+            // Single choice - restore selected answer
+            const input = document.getElementById(`answer-${savedAnswer}`);
+            const answerDiv = input.closest('.answer-option');
+            if (input && answerDiv) {
+                input.checked = true;
+                answerDiv.classList.add('selected');
+            }
+        }
+    }
+    
     // Show/hide buttons
     if (currentQuestion === shuffledQuestions.length - 1) {
         document.getElementById('next-btn').style.display = 'none';
@@ -1752,6 +1776,16 @@ function displayQuestion() {
     } else {
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('submit-btn').style.display = 'none';
+    }
+    
+    // Enable/disable back button based on current question
+    const backBtn = document.getElementById('back-btn');
+    if (currentQuestion === 0) {
+        backBtn.disabled = true;
+        backBtn.style.opacity = '0.5';
+    } else {
+        backBtn.disabled = false;
+        backBtn.style.opacity = '1';
     }
 }
 
@@ -1761,6 +1795,17 @@ function nextQuestion() {
     
     currentQuestion++;
     displayQuestion();
+}
+
+function previousQuestion() {
+    // Save current answer
+    saveCurrentAnswer();
+    
+    // Go to previous question if not on first question
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        displayQuestion();
+    }
 }
 
 function saveCurrentAnswer() {
@@ -2425,10 +2470,31 @@ function drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
 
 function downloadCertificate() {
     const canvas = document.getElementById('certificate-canvas');
-    const link = document.createElement('a');
-    link.download = `${studentData.firstName}_${studentData.lastName}_Safety_Certificate.png`;
-    link.href = canvas.toDataURL();
-    link.click();
+    
+    // Convert canvas to blob for better compatibility across devices including Chromebooks
+    canvas.toBlob(function(blob) {
+        if (blob) {
+            // Create a download link using blob URL
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `${studentData.firstName}_${studentData.lastName}_Safety_Certificate.png`;
+            link.href = url;
+            
+            // Append to body temporarily to ensure it works on all browsers
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } else {
+            // Fallback to original method if blob creation fails
+            const link = document.createElement('a');
+            link.download = `${studentData.firstName}_${studentData.lastName}_Safety_Certificate.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    }, 'image/png');
 }
 
 function loadProgress() {

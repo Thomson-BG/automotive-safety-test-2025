@@ -109,6 +109,7 @@
             <div class="quiz-container">
                 <div class="quiz-header">
                     <h2 id="quiz-title">Safety Test</h2>
+                    <button id="menu-btn" class="btn-menu" onclick="backToMenu()">Return to Menu</button>
                     <div class="progress-bar">
                         <div class="progress" id="progress"></div>
                     </div>
@@ -119,7 +120,7 @@
                     <div class="answers" id="answers"></div>
                 </div>
                 <div class="quiz-controls">
-                    <button id="back-btn" class="btn-back" onclick="backToMenu()">
+                    <button id="back-btn" class="btn-back" onclick="previousQuestion()">
                         <span class="back-arrow">←</span>
                         BACK
                     </button>
@@ -267,7 +268,7 @@
                     <div class="settings-container">
                         <div class="setting-item">
                             <h4>Time-Based Access Code System</h4>
-                            <p>Tests are secured with a rotating 5-digit access code that changes every 1 hour. Students must enter the current code to access tests.</p>
+                            <p>Tests are secured with a rotating 5-digit access code that changes every 90 minutes. Students must enter the current code to access tests.</p>
                             
                             <div class="access-code-display">
                                 <div class="current-code">
@@ -293,7 +294,7 @@
                             <div class="code-info">
                                 <h5>How It Works:</h5>
                                 <ul>
-                                    <li>A new 5-digit code is generated every 1 hour automatically</li>
+                                    <li>A new 5-digit code is generated every 90 minutes automatically</li>
                                     <li>Students must enter the current code to access tests</li>
                                     <li>Access is automatically revoked when the code expires</li>
                                     <li>No URLs need to be shared - the system enforces access across all devices</li>
