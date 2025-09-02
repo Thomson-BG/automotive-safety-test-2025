@@ -2548,17 +2548,13 @@ function submitAdminLogin() {
     const username = document.getElementById('admin-username').value;
     const password = document.getElementById('admin-password').value;
     
-    if (username === 'Thomson' && password === 'Bulldog!1') {
-        isAdminLoggedIn = true;
-        closeAdminLoginModal();
-        showSection('admin-dashboard');
-        loadTestQuestions();
-
-    if (username === 'Admin' && password === 'Pass123#') {
-        isAdminLoggedIn = true;
-        closeAdminLoginModal();
-        showSection('admin-dashboard');
-        loadTestQuestions();
+   if (username === 'Thomson' && password === 'Bulldog!1') {
+    // success logic
+} else if (username === 'Admin' && password === 'Pass123#') {
+    // success logic for second admin
+} else {
+    // error logic
+}
         
         // Initialize access code display
         updateAccessCodeDisplay();
